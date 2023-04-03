@@ -38,14 +38,16 @@ class DaTongSolitaire:
             hand_cards.sort(key=cmp_to_key(Card.cmp))
             for card_tuple in hand_cards:
                 Card(*card_tuple, self.hand[i])
-    
+        
+        # 状态
+        self.focused_card = None
     
     def run_game(self):
         """开始游戏的主循环"""
         while True:
             self._check_events()
             self._update_screen()
-            self.clock.tick(60)
+            self.clock.tick(30)
 
     def _check_events(self):
         """响应按键和鼠标事件"""
@@ -73,7 +75,6 @@ class DaTongSolitaire:
         for i, card in enumerate(self.hand[0]):
             card.rect.left = left_margin + i * Settings.hand_card_x_spacing
             card.rect.bottom = Settings.screen_height + 0.6 * Settings.hand_card_height
-        self.hand[0].draw(self.screen)
         
         # 显示右侧玩家手牌
         top_margin = (Settings.screen_height
@@ -82,7 +83,6 @@ class DaTongSolitaire:
         for i, card in enumerate(self.hand[1]):
             card.rect.top = top_margin + i * Settings.hand_card_y_spacing
             card.rect.right = Settings.screen_width + 0.6 * Settings.hand_card_width
-        self.hand[1].draw(self.screen)
         
         # 显示对侧玩家的手牌
         right_margin = (Settings.screen_width
@@ -91,7 +91,6 @@ class DaTongSolitaire:
         for i, card in enumerate(self.hand[2]):
             card.rect.right = Settings.screen_width - (right_margin + i * Settings.hand_card_x_spacing)
             card.rect.top = 0 - 0.6 * Settings.hand_card_height
-        self.hand[2].draw(self.screen)
         
         # 显示左侧玩家手牌
         top_margin = (Settings.screen_height
@@ -100,7 +99,30 @@ class DaTongSolitaire:
         for i, card in enumerate(self.hand[3]):
             card.rect.top = top_margin + i * Settings.hand_card_y_spacing
             card.rect.left = 0 - 0.6 * Settings.hand_card_width
-        self.hand[3].draw(self.screen)
+        
+        # 检测鼠标是否聚焦手牌
+        self.focused_card = None
+        pos = pygame.mouse.get_pos()
+        if not self.is_focusing_card:
+            for i, hand in enumerate(self.hand):
+                for card in reversed(hand.sprites()):
+                    if card.rect.collidepoint(pos):
+                        self.focused_card = card
+                        if i == 0:
+                            card.rect.bottom = Settings.screen_height
+                        elif i == 1:
+                            card.rect.right = Settings.screen_width
+                        elif i == 2:
+                            card.rect.top = 0
+                        elif i == 3:
+                            card.rect.left = 0
+                        else:
+                            raise Exception("Too many hand!")
+                        break
+        
+        # 显示手牌
+        for i in range(4):
+            self.hand[i].draw(self.screen)
 
 
 if __name__ == '__main__':
