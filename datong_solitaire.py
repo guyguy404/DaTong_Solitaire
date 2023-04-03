@@ -20,8 +20,10 @@ class DaTongSolitaire:
         pygame.display.set_caption("大通纸牌")
         
         self.hand: list[Group] = []
-        self.discard_pile = []
-        self.played_cards = []
+        self.discard_pile: list[Group] = []
+        self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
+        self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
+        self.played_cards_7: list[list[Card]] = [[], [], [], []]
         
         # 手牌为一个list，里面包含4个Group，每个Group代表一个人的手牌
         for i in range(4):
@@ -40,7 +42,8 @@ class DaTongSolitaire:
                 Card(*card_tuple, self.hand[i])
         
         # 状态
-        self.focused_card = None
+        self.focused_card: Card = None
+        self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出梅花7
     
     def run_game(self):
         """开始游戏的主循环"""
@@ -57,6 +60,43 @@ class DaTongSolitaire:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == pygame.BUTTON_LEFT:
+                    if self.focused_card:
+                        if self.focused_card.info in self.playable_cards:
+                            
+                            # 将此牌从手中移动到场上
+                            card = self.focused_card
+                            if card.rank < 7:
+                                self.played_cards_less_7[card.suit].append(card)
+                            elif card.rank > 7:
+                                self.played_cards_greater_7[card.suit].append(card)
+                            else:
+                                self.played_cards_7[card.suit].append(card)
+                            for hand in self.hand:
+                                hand.remove(card)
+                            
+                            # 更新可打出牌的列表
+                            self.playable_cards.remove(card.info)
+                            if card.info == (0, 7):
+                                for i in range(1, 4):
+                                    self.playable_cards.append((i, 7))
+                                self.playable_cards.append((0, 6))
+                                self.playable_cards.append((0, 8))
+                            elif card.rank == 7:
+                                self.playable_cards.append((card.suit, 6))
+                                self.playable_cards.append((card.suit, 8))
+                            elif card.rank == 1 or card.rank == 13:
+                                pass
+                            elif card.rank < 7:
+                                self.playable_cards.append((card.suit, card.rank - 1))
+                            elif card.rank > 7:
+                                self.playable_cards.append((card.suit, card.rank + 1))
+                            else:
+                                raise Exception("We met a mistake in updating playable_cards!")
+                            
+                        else:
+                            print("不能打出此牌！")
 
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
@@ -99,26 +139,44 @@ class DaTongSolitaire:
         for i, card in enumerate(self.hand[3]):
             card.rect.top = top_margin + i * Settings.hand_card_y_spacing
             card.rect.left = 0 - 0.6 * Settings.hand_card_width
+            
+        # 显示场上卡牌
+        for i in range(4):
+            for j, card in enumerate(reversed(self.played_cards_greater_7[i])):
+                card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
+                card.rect.centery = Settings.screen_height // 2 - (j+1) * Settings.field_y_spacing
+                self.screen.blit(card.image, card.rect)
+
+        for i in range(4):
+            for j, card in enumerate(self.played_cards_7[i]):
+                card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
+                card.rect.centery = Settings.screen_height // 2
+                self.screen.blit(card.image, card.rect)
+        
+        for i in range(4):
+            for j, card in enumerate(self.played_cards_less_7[i]):
+                card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
+                card.rect.centery = Settings.screen_height // 2 + (j+1) * Settings.field_y_spacing
+                self.screen.blit(card.image, card.rect)
         
         # 检测鼠标是否聚焦手牌
         self.focused_card = None
         pos = pygame.mouse.get_pos()
-        if not self.is_focusing_card:
-            for i, hand in enumerate(self.hand):
-                for card in reversed(hand.sprites()):
-                    if card.rect.collidepoint(pos):
-                        self.focused_card = card
-                        if i == 0:
-                            card.rect.bottom = Settings.screen_height
-                        elif i == 1:
-                            card.rect.right = Settings.screen_width
-                        elif i == 2:
-                            card.rect.top = 0
-                        elif i == 3:
-                            card.rect.left = 0
-                        else:
-                            raise Exception("Too many hand!")
-                        break
+        for i, hand in enumerate(self.hand):
+            for card in reversed(hand.sprites()):
+                if card.rect.collidepoint(pos):
+                    self.focused_card = card
+                    if i == 0:
+                        card.rect.bottom = Settings.screen_height
+                    elif i == 1:
+                        card.rect.right = Settings.screen_width
+                    elif i == 2:
+                        card.rect.top = 0
+                    elif i == 3:
+                        card.rect.left = 0
+                    else:
+                        raise Exception("Too many hand!")
+                    break
         
         # 显示手牌
         for i in range(4):

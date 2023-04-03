@@ -15,3 +15,8 @@ class Settings:
     hand_card_x_spacing = 0.5 * hand_card_width
     hand_card_y_spacing = 0.25 * hand_card_height
     suits = ['spade', 'club', 'heart', 'diamond']
+    
+    # 场地设置
+    field_x_spacing = screen_width // 6
+    field_x_margin = int(field_x_spacing * 1.5)
+    field_y_spacing = hand_card_y_spacing

@@ -18,6 +18,9 @@ class Card(Sprite):
         self.image = self.image.convert()
         # 获取图像对应的矩形
         self.rect = self.image.get_rect()
+        self.info = (suit, rank)
+        self.suit = suit
+        self.rank = rank
     
     def blitme(self):
         """在指定位置绘制卡牌"""
