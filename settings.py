@@ -20,3 +20,8 @@ class Settings:
     field_x_spacing = screen_width // 6
     field_x_margin = int(field_x_spacing * 1.5)
     field_y_spacing = hand_card_y_spacing
+
+    def init():
+        Settings.field_x_spacing = Settings.screen_width // 6
+        Settings.field_x_margin = int(Settings.field_x_spacing * 1.5)
+        Settings.field_y_spacing = Settings.hand_card_y_spacing

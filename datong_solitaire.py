@@ -17,6 +17,7 @@ class DaTongSolitaire:
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         Settings.screen_height = self.screen.get_rect().height
         Settings.screen_width = self.screen.get_rect().width
+        Settings.init()
         pygame.display.set_caption("大通纸牌")
         
         self.hand: list[Group] = []
@@ -144,7 +145,8 @@ class DaTongSolitaire:
         for i in range(4):
             for j, card in enumerate(reversed(self.played_cards_greater_7[i])):
                 card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
-                card.rect.centery = Settings.screen_height // 2 - (j+1) * Settings.field_y_spacing
+                n = len(self.played_cards_greater_7[i])
+                card.rect.centery = Settings.screen_height // 2 - (n-j) * Settings.field_y_spacing
                 self.screen.blit(card.image, card.rect)
 
         for i in range(4):
