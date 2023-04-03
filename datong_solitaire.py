@@ -30,11 +30,11 @@ class DaTongSolitaire:
         # 生成卡牌，洗牌并发牌
         cards = []
         for i in range(4):
-            for j in range(1, 13):
+            for j in range(1, 13+1):
                 cards.append((i, j))
         shuffle(cards)
         for i in range(4):
-            hand_cards = cards[i*13:(i+1)*13-1]
+            hand_cards = cards[i*13:(i+1)*13]
             hand_cards.sort(key=cmp_to_key(Card.cmp))
             for card_tuple in hand_cards:
                 Card(*card_tuple, self.hand[i])
@@ -59,16 +59,48 @@ class DaTongSolitaire:
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
         self.screen.fill(Settings.bg_color)
+        self._update_hands()
         
+        pygame.display.flip()
+    
+    def _update_hands(self):
+        """更新手牌图像"""
+        
+        # 显示我的手牌
         left_margin = (Settings.screen_width
-                       - (len(self.hand[0])-1) * Settings.hand_card_spacing
+                       - (len(self.hand[0])-1) * Settings.hand_card_x_spacing
                        - Settings.hand_card_width) // 2
         for i, card in enumerate(self.hand[0]):
-            card.rect.left = left_margin + i * Settings.hand_card_spacing
-            card.rect.bottom = Settings.screen_height
+            card.rect.left = left_margin + i * Settings.hand_card_x_spacing
+            card.rect.bottom = Settings.screen_height + 0.6 * Settings.hand_card_height
         self.hand[0].draw(self.screen)
-                
-        pygame.display.flip()
+        
+        # 显示右侧玩家手牌
+        top_margin = (Settings.screen_height
+                       - (len(self.hand[1])-1) * Settings.hand_card_y_spacing
+                       - Settings.hand_card_height) // 2
+        for i, card in enumerate(self.hand[1]):
+            card.rect.top = top_margin + i * Settings.hand_card_y_spacing
+            card.rect.right = Settings.screen_width + 0.6 * Settings.hand_card_width
+        self.hand[1].draw(self.screen)
+        
+        # 显示对侧玩家的手牌
+        right_margin = (Settings.screen_width
+                       - (len(self.hand[2])-1) * Settings.hand_card_x_spacing
+                       - Settings.hand_card_width) // 2
+        for i, card in enumerate(self.hand[2]):
+            card.rect.right = Settings.screen_width - (right_margin + i * Settings.hand_card_x_spacing)
+            card.rect.top = 0 - 0.6 * Settings.hand_card_height
+        self.hand[2].draw(self.screen)
+        
+        # 显示左侧玩家手牌
+        top_margin = (Settings.screen_height
+                       - (len(self.hand[3])-1) * Settings.hand_card_y_spacing
+                       - Settings.hand_card_height) // 2
+        for i, card in enumerate(self.hand[3]):
+            card.rect.top = top_margin + i * Settings.hand_card_y_spacing
+            card.rect.left = 0 - 0.6 * Settings.hand_card_width
+        self.hand[3].draw(self.screen)
 
 
 if __name__ == '__main__':

@@ -12,5 +12,6 @@ class Settings:
     load_card_scale = 0.3
     hand_card_width = load_card_scale * card_width
     hand_card_height = load_card_scale * card_height
-    hand_card_spacing = 0.5 * hand_card_width
+    hand_card_x_spacing = 0.5 * hand_card_width
+    hand_card_y_spacing = 0.25 * hand_card_height
     suits = ['spade', 'club', 'heart', 'diamond']
