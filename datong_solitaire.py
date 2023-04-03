@@ -2,6 +2,7 @@ import sys
 import pygame
 from pygame.sprite import Sprite, Group
 from random import shuffle
+from functools import cmp_to_key
 
 from settings import Settings
 from card import Card
@@ -32,11 +33,13 @@ class DaTongSolitaire:
             for j in range(1, 13):
                 cards.append((i, j))
         shuffle(cards)
-        for i, card_tuple in enumerate(cards):
-            Card(*card_tuple, self.hand[i//13])
-        
-        # self.card = Card('heart', 2)  # test card
-      
+        for i in range(4):
+            hand_cards = cards[i*13:(i+1)*13-1]
+            hand_cards.sort(key=cmp_to_key(Card.cmp))
+            for card_tuple in hand_cards:
+                Card(*card_tuple, self.hand[i])
+    
+    
     def run_game(self):
         """开始游戏的主循环"""
         while True:
@@ -64,9 +67,7 @@ class DaTongSolitaire:
             card.rect.left = left_margin + i * Settings.hand_card_spacing
             card.rect.bottom = Settings.screen_height
         self.hand[0].draw(self.screen)
-        
-        # self.card.blitme()   # test
-        
+                
         pygame.display.flip()
 
 

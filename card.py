@@ -47,3 +47,12 @@ class Card(Sprite):
             filename += '2'
         filename += '.png'
         return filename
+    
+    def cmp(x, y):
+        """返回两个卡牌的顺序关系"""
+        if x[0] < y[0] or x[0] == y[0] and x[1] < y[1]:
+            return -1
+        elif x[0] > y[0] or x[0] == y[0] and x[1] > y[1]:
+            return 1
+        else:
+            return 0
