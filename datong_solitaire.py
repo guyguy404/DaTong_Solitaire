@@ -6,6 +6,7 @@ from functools import cmp_to_key
 
 from settings import Settings
 from card import Card
+from board import Board
 
 class DaTongSolitaire:
     """管理游戏资源和行为的类"""
@@ -20,6 +21,7 @@ class DaTongSolitaire:
         Settings.init()
         pygame.display.set_caption("大通纸牌")
         
+        self.board = Board(self)
         self.hand: list[Group] = []
         self.discard_pile: list[Group] = []
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
@@ -39,12 +41,15 @@ class DaTongSolitaire:
         for i in range(4):
             hand_cards = cards[i*13:(i+1)*13]
             hand_cards.sort(key=cmp_to_key(Card.cmp))
+            if (0, 7) in hand_cards:
+                current_player = i
             for card_tuple in hand_cards:
                 Card(*card_tuple, self.hand[i])
         
         # 状态
         self.focused_card: Card = None
         self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出梅花7
+        self.current_player = current_player
     
     def run_game(self):
         """开始游戏的主循环"""
@@ -64,7 +69,7 @@ class DaTongSolitaire:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == pygame.BUTTON_LEFT:
                     if self.focused_card:
-                        if self.focused_card.info in self.playable_cards:
+                        if self.focused_card.info in self.playable_cards and self.focused_card in self.hand[self.current_player]:
                             
                             # 将此牌从手中移动到场上
                             card = self.focused_card
@@ -96,15 +101,24 @@ class DaTongSolitaire:
                             else:
                                 raise Exception("We met a mistake in updating playable_cards!")
                             
+                            # 更新当前玩家
+                            self.current_player = (self.current_player + 1) % 4
+                            
                         else:
                             print("不能打出此牌！")
 
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
         self.screen.fill(Settings.bg_color)
+        self._update_board()
         self._update_hands()
         
         pygame.display.flip()
+    
+    def _update_board(self):
+        """更新信息面板图像"""
+        self.board.update()
+        self.board.blitme()
     
     def _update_hands(self):
         """更新手牌图像"""
@@ -183,7 +197,7 @@ class DaTongSolitaire:
         # 显示手牌
         for hand in self.hand:
             for card in hand:
-                if card.info in self.playable_cards:
+                if card.info in self.playable_cards and card in self.hand[self.current_player]:
                     frame_rect = card.rect.inflate(
                             Settings.playable_card_frame_width,
                             Settings.playable_card_frame_width

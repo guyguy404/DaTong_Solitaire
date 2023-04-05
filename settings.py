@@ -1,5 +1,10 @@
+import pygame
+
 class Settings:
     """存储游戏中所有设置的类"""
+    # 中文字体
+    font = '霞鹜文楷'
+    font_path = pygame.font.match_font(font)
     
     # 屏幕设置
     screen_width = 1200
@@ -23,6 +28,16 @@ class Settings:
     field_x_spacing = screen_width // 6
     field_x_margin = int(field_x_spacing * 1.5)
     field_y_spacing = hand_card_y_spacing
+    
+    # 信息面板设置
+    board_width = 200
+    board_height = 100
+    board_x_margin = 90
+    board_y_margin = 20
+    board_color = (205, 170, 125)
+    board_font_size = 20
+    board_text_left_margin = 20
+    board_text_top_margin = 20
 
     def init():
         Settings.field_x_spacing = Settings.screen_width // 6
