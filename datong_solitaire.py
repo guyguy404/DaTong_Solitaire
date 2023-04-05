@@ -181,8 +181,21 @@ class DaTongSolitaire:
                     break
         
         # 显示手牌
-        for i in range(4):
-            self.hand[i].draw(self.screen)
+        for hand in self.hand:
+            for card in hand:
+                if card.info in self.playable_cards:
+                    frame_rect = card.rect.inflate(
+                            Settings.playable_card_frame_width,
+                            Settings.playable_card_frame_width
+                        )
+                    pygame.draw.rect(
+                            self.screen,
+                            Settings.playable_card_frame_color,
+                            frame_rect,
+                            width=Settings.playable_card_frame_width,
+                            border_radius=Settings.playable_card_frame_border_radius
+                        )
+                card.blitme()
 
 
 if __name__ == '__main__':

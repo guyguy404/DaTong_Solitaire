@@ -15,6 +15,9 @@ class Settings:
     hand_card_x_spacing = 0.5 * hand_card_width
     hand_card_y_spacing = 0.25 * hand_card_height
     suits = ['spade', 'club', 'heart', 'diamond']
+    playable_card_frame_color = (255, 0, 0)
+    playable_card_frame_width = 15
+    playable_card_frame_border_radius = 7    # 边框圆角的半径
     
     # 场地设置
     field_x_spacing = screen_width // 6
