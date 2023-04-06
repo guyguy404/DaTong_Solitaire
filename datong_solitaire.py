@@ -46,7 +46,7 @@ class DaTongSolitaire:
         
         # 状态
         self.focused_card: Card = None
-        self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出梅花7
+        self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出黑桃7
         self.start_player = start_player
         self.current_player = start_player
         self.can_play_card = True   # 根据规则，当前玩家是否能出牌
