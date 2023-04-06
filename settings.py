@@ -11,6 +11,21 @@ class Settings:
     screen_height = 800
     bg_color = (105, 139, 105)
     
+    # 开始界面相关设置
+    play_button_msg = "开始游戏"
+    play_button_width = 200
+    play_button_height = 100
+    play_button_color = (255, 255, 255)
+    play_button_text_color = (0, 0, 0)
+    play_button_font_size = 32
+    exit_button_msg = "退出游戏"
+    exit_button_width = play_button_width
+    exit_button_height = play_button_height
+    exit_button_color = play_button_color
+    exit_button_text_color = play_button_text_color
+    exit_button_font_size = play_button_font_size
+    start_menu_button_spacing = 50
+    
     # 卡牌相关设置
     card_width = 500
     card_height = 726

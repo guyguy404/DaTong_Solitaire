@@ -8,6 +8,8 @@ from functools import cmp_to_key
 from settings import Settings
 from card import Card
 from board import Board
+from button import Button
+from game_stage import GameStage
 
 class DaTongSolitaire:
     """管理游戏资源和行为的类"""
@@ -21,7 +23,25 @@ class DaTongSolitaire:
         Settings.screen_width = self.screen.get_rect().width
         Settings.init()
         pygame.display.set_caption("大通纸牌")
+        self.game_stage = GameStage.start_menu
         
+        self.play_button = Button(
+            msg=Settings.play_button_msg,
+            width=Settings.play_button_width,
+            height=Settings.play_button_height,
+            button_color=Settings.play_button_color,
+            text_color=Settings.play_button_text_color,
+            font_size=Settings.play_button_font_size
+        )
+        self.exit_button = Button(
+            msg=Settings.exit_button_msg,
+            width=Settings.exit_button_width,
+            height=Settings.exit_button_height,
+            button_color=Settings.exit_button_color,
+            text_color=Settings.exit_button_text_color,
+            font_size=Settings.exit_button_font_size
+        )
+        self.exit_button.rect.y = self.play_button.rect.y + Settings.start_menu_button_spacing + Settings.play_button_height
         self.board = Board(self)
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
@@ -56,10 +76,19 @@ class DaTongSolitaire:
         """开始游戏的主循环"""
         while True:
             self._check_events()
+            self._update_objects()
             self._update_screen()
+            self.clock.tick(30)
+
+    def _update_objects(self):
+        """更新游戏中的物体属性等"""
+        if self.game_stage == GameStage.start_menu:
+            pass
+        elif self.game_stage == GameStage.playing:
+            self.board.update()
+            self._update_cards()
             if self.end_turn:
                 self._next_turn()
-            self.clock.tick(30)
 
     def _check_events(self):
         """响应按键和鼠标事件"""
@@ -71,8 +100,16 @@ class DaTongSolitaire:
                     sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == pygame.BUTTON_LEFT:
-                    if self.focused_card:
-                        self._on_focused_card_clicked()
+                    if self.game_stage == GameStage.start_menu:
+                        # 检测是否点击了按钮
+                        mouse_pos = pygame.mouse.get_pos()
+                        if self.play_button.rect.collidepoint(mouse_pos):
+                            self.game_stage = GameStage.playing
+                        elif self.exit_button.rect.collidepoint(mouse_pos):
+                            sys.exit()
+                    elif self.game_stage == GameStage.playing:
+                        if self.focused_card:
+                            self._on_focused_card_clicked()
 
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
@@ -171,15 +208,14 @@ class DaTongSolitaire:
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
         self.screen.fill(Settings.bg_color)
-        self._update_board()
-        self._update_cards()
+        if self.game_stage == GameStage.start_menu:
+            self.play_button.blitme()
+            self.exit_button.blitme()
+        elif self.game_stage == GameStage.playing:
+            self.board.blitme()
+            self._draw_cards()
         
         pygame.display.flip()
-    
-    def _update_board(self):
-        """更新信息面板图像"""
-        self.board.update()
-        self.board.blitme()
     
     def _update_cards(self):
         """更新所有卡牌的图像"""
@@ -242,19 +278,16 @@ class DaTongSolitaire:
                 card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
                 n = len(self.played_cards_greater_7[i])
                 card.rect.centery = Settings.screen_height // 2 - (n-j) * Settings.field_y_spacing
-                self.screen.blit(card.image, card.rect)
 
         for i in range(4):
             for j, card in enumerate(self.played_cards_7[i]):
                 card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
                 card.rect.centery = Settings.screen_height // 2
-                self.screen.blit(card.image, card.rect)
         
         for i in range(4):
             for j, card in enumerate(self.played_cards_less_7[i]):
                 card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
                 card.rect.centery = Settings.screen_height // 2 + (j+1) * Settings.field_y_spacing
-                self.screen.blit(card.image, card.rect)
         
         # 检测鼠标是否聚焦手牌
         self.focused_card = None
@@ -274,6 +307,21 @@ class DaTongSolitaire:
                     else:
                         raise Exception("Too many hand!")
                     break
+        
+    def _draw_cards(self):
+        """在屏幕上绘制所有卡牌"""
+        # 显示场上卡牌
+        for i in range(4):
+            for card in reversed(self.played_cards_greater_7[i]):
+                self.screen.blit(card.image, card.rect)
+
+        for i in range(4):
+            for card in self.played_cards_7[i]:
+                self.screen.blit(card.image, card.rect)
+        
+        for i in range(4):
+            for card in self.played_cards_less_7[i]:
+                self.screen.blit(card.image, card.rect)
         
         # 显示手牌
         for hand in self.hand:
