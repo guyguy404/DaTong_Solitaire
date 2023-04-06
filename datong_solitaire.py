@@ -40,14 +40,15 @@ class DaTongSolitaire:
             hand_cards = cards[i*13:(i+1)*13]
             hand_cards.sort(key=cmp_to_key(Card.cmp))
             if (0, 7) in hand_cards:
-                current_player = i
+                start_player = i
             for card_tuple in hand_cards:
                 Card(*card_tuple, self.hand[i])
         
         # 状态
         self.focused_card: Card = None
         self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出梅花7
-        self.current_player = current_player
+        self.start_player = start_player
+        self.current_player = start_player
         self.can_play_card = True   # 根据规则，当前玩家是否能出牌
         self.end_turn = False
     
@@ -75,6 +76,13 @@ class DaTongSolitaire:
 
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
+        self.end_turn = False
+        # 判断是否游戏结束
+        # 如果所有玩家均没有手牌了则游戏结束
+        if not any(self.hand):
+            self._end_game()
+            return
+        
         # 更新当前玩家 和 当前玩家是否可出牌的状态
         self.current_player = (self.current_player + 1) % 4
         self.can_play_card = False
@@ -82,7 +90,24 @@ class DaTongSolitaire:
             if card.info in self.playable_cards:
                 self.can_play_card = True
                 break
-        self.end_turn = False
+    
+    def _end_game(self):
+        """游戏结束时的结算"""
+        score_multiply_power = 1
+        # 弃牌点数加总
+        points = [0, 0, 0, 0]
+        for i, player_trashed_cards in enumerate(self.trashed_cards):
+            for card in player_trashed_cards:
+                points[i] += card.rank
+        # 后手玩家惩罚点数
+        for i in range(4):
+            points[(self.start_player + i) % 4] += i / 10
+        # 排序得出分数
+        sorted_player_points_pairs = sorted(enumerate(points), key=lambda x: x[1])
+        if sorted_player_points_pairs[0][1] < 1:
+            score_multiply_power = 2   # 大通
+        for i, pair in enumerate(sorted_player_points_pairs):
+            self.score[pair[0]] += Settings.base_score[i] * score_multiply_power
     
     def _on_focused_card_clicked(self):
         """当聚焦的卡牌被点击时"""

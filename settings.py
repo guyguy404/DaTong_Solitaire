@@ -39,6 +39,9 @@ class Settings:
     board_text_left_margin = 20
     board_text_top_margin = 20
     board_text_line_spacing = 10
+    
+    # 分数设置
+    base_score = [6, -1, -2, -3]
 
     def init():
         Settings.field_x_spacing = Settings.screen_width // 6
