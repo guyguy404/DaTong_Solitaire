@@ -23,15 +23,11 @@ class DaTongSolitaire:
         pygame.display.set_caption("大通纸牌")
         
         self.board = Board(self)
-        self.hand: list[Group] = []
+        self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_7: list[list[Card]] = [[], [], [], []]
-        
-        # 手牌为一个list，里面包含4个Group，每个Group代表一个人的手牌
-        for i in range(4):
-            self.hand.append(Group())
         
         # 生成卡牌，洗牌并发牌
         cards = []
@@ -92,60 +88,65 @@ class DaTongSolitaire:
         card = self.focused_card
         # 如果聚焦的卡牌为当前玩家的卡牌并且可以打出
         if card.info in self.playable_cards and card in self.hand[self.current_player]:
-            # 将此牌从手中移动到场上
-            if card.rank < 7:
-                self.played_cards_less_7[card.suit].append(card)
-            elif card.rank > 7:
-                self.played_cards_greater_7[card.suit].append(card)
-            else:
-                self.played_cards_7[card.suit].append(card)
-            # for hand in self.hand:
-            #     hand.remove(card)
-            self.hand[self.current_player].remove(card)
-            
-            # 更新可打出牌的列表
-            self.playable_cards.remove(card.info)
-            if card.info == (0, 7):
-                for i in range(1, 4):
-                    self.playable_cards.append((i, 7))
-                self.playable_cards.append((0, 6))
-                self.playable_cards.append((0, 8))
-            elif card.rank == 7:
-                self.playable_cards.append((card.suit, 6))
-                self.playable_cards.append((card.suit, 8))
-            elif card.rank == 1 or card.rank == 13:
-                pass
-            elif card.rank < 7:
-                self.playable_cards.append((card.suit, card.rank - 1))
-            elif card.rank > 7:
-                self.playable_cards.append((card.suit, card.rank + 1))
-            else:
-                raise Exception("We met a mistake in updating playable_cards!")
-            
-            self.end_turn = True
+            self._play_card(card)
             
         # 如果聚焦的卡牌为当前玩家的卡牌，但是当前玩家无牌可出，则被点击的卡牌视为弃牌
         elif not self.can_play_card and card in self.hand[self.current_player]:
-            # 将此牌从手中移动到弃牌堆
-            self.trashed_cards[self.current_player].add(card)
-            self.hand[self.current_player].remove(card)
-            
-            # 改变被弃牌的UI
-            # card.image.set_alpha(150)
-            pixels = pygame.surfarray.pixels3d(card.image)
-            # pixels += (255 - pygame.surfarray.pixels3d(card.image)) // 2
-            pixels //= 2
-            
-            self.end_turn = True
+            self._discard_card(card)
             
         else:
             print("不能打出此牌！")
+    
+    def _play_card(self, card: Card):
+        """当前玩家打出指定的卡牌"""
+        # 将此牌从手中移动到场上
+        if card.rank < 7:
+            self.played_cards_less_7[card.suit].append(card)
+        elif card.rank > 7:
+            self.played_cards_greater_7[card.suit].append(card)
+        else:
+            self.played_cards_7[card.suit].append(card)
+        self.hand[self.current_player].remove(card)
+        
+        # 更新可打出牌的列表
+        self.playable_cards.remove(card.info)
+        if card.info == (0, 7):
+            for i in range(1, 4):
+                self.playable_cards.append((i, 7))
+            self.playable_cards.append((0, 6))
+            self.playable_cards.append((0, 8))
+        elif card.rank == 7:
+            self.playable_cards.append((card.suit, 6))
+            self.playable_cards.append((card.suit, 8))
+        elif card.rank == 1 or card.rank == 13:
+            pass
+        elif card.rank < 7:
+            self.playable_cards.append((card.suit, card.rank - 1))
+        elif card.rank > 7:
+            self.playable_cards.append((card.suit, card.rank + 1))
+        else:
+            raise Exception("We met a mistake in updating playable_cards!")
+        
+        self.end_turn = True
+    
+    def _discard_card(self, card: Card):
+        """当前玩家弃置指定的卡牌"""
+        # 将此牌从手中移动到弃牌堆
+        self.trashed_cards[self.current_player].add(card)
+        self.hand[self.current_player].remove(card)
+        
+        # 改变被弃牌的UI
+        pixels = pygame.surfarray.pixels3d(card.image)
+        pixels //= 2
+        
+        self.end_turn = True
+            
 
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
         self.screen.fill(Settings.bg_color)
         self._update_board()
-        self._update_hands()
+        self._update_cards()
         
         pygame.display.flip()
     
@@ -154,8 +155,8 @@ class DaTongSolitaire:
         self.board.update()
         self.board.blitme()
     
-    def _update_hands(self):
-        """更新手牌图像"""
+    def _update_cards(self):
+        """更新所有卡牌的图像"""
         
         #  设置我的手牌位置
         left_margin = (Settings.screen_width
