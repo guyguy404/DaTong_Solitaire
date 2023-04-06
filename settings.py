@@ -6,6 +6,9 @@ class Settings:
     font = '霞鹜文楷'
     font_path = pygame.font.match_font(font)
     
+    # 颜色
+    black = (0, 0, 0)
+    
     # 屏幕设置
     screen_width = 1200
     screen_height = 800
@@ -57,7 +60,19 @@ class Settings:
     
     # 分数设置
     base_score = [6, -1, -2, -3]
-
+    
+    # 游戏结束菜单设置
+    game_over_menu_width = 1200
+    game_over_menu_height = 800
+    game_over_menu_color = board_color
+    game_over_menu_title_font_size = 52
+    game_over_menu_title_color = black
+    game_over_menu_title_top_margin = 50
+    game_over_menu_content_font_size = 40
+    game_over_menu_content_color = black
+    game_over_menu_content_top_margin = 160
+    game_over_menu_content_line_spacing = 20
+    
     def init():
         Settings.field_x_spacing = Settings.screen_width // 6
         Settings.field_x_margin = int(Settings.field_x_spacing * 1.5)

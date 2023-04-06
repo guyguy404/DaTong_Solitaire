@@ -10,6 +10,7 @@ from card import Card
 from board import Board
 from button import Button
 from game_stage import GameStage
+from game_over_menu import GameOverMenu
 
 class DaTongSolitaire:
     """管理游戏资源和行为的类"""
@@ -89,6 +90,8 @@ class DaTongSolitaire:
             self._update_cards()
             if self.end_turn:
                 self._next_turn()
+        elif self.game_stage == GameStage.game_over_menu:
+            self.game_over_menu.update()
 
     def _check_events(self):
         """响应按键和鼠标事件"""
@@ -110,6 +113,9 @@ class DaTongSolitaire:
                     elif self.game_stage == GameStage.playing:
                         if self.focused_card:
                             self._on_focused_card_clicked()
+                    elif self.game_stage == GameStage.game_over_menu:
+                        # TODO
+                        pass
 
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
@@ -145,6 +151,9 @@ class DaTongSolitaire:
             score_multiply_power = 2   # 大通
         for i, pair in enumerate(sorted_player_points_pairs):
             self.score[pair[0]] += Settings.base_score[i] * score_multiply_power
+        
+        self.game_stage = GameStage.game_over_menu
+        self.game_over_menu = GameOverMenu(self, sorted_player_points_pairs)
     
     def _on_focused_card_clicked(self):
         """当聚焦的卡牌被点击时"""
@@ -214,6 +223,15 @@ class DaTongSolitaire:
         elif self.game_stage == GameStage.playing:
             self.board.blitme()
             self._draw_cards()
+        elif self.game_stage == GameStage.game_over_menu:
+            self.board.blitme()
+            self._draw_cards()
+            # 将牌桌作为背景变暗，以凸显游戏结束界面
+            pixels = pygame.surfarray.pixels3d(self.screen)
+            pixels //= 2
+            del pixels
+            # 背景变暗后再绘制游戏结束界面
+            self.game_over_menu.blitme()
         
         pygame.display.flip()
     
