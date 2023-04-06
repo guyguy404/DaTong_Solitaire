@@ -28,6 +28,7 @@ class DaTongSolitaire:
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_7: list[list[Card]] = [[], [], [], []]
+        self.score:list[int] = [0, 0, 0, 0]
         
         # 生成卡牌，洗牌并发牌
         cards = []

@@ -31,13 +31,14 @@ class Settings:
     
     # 信息面板设置
     board_width = 200
-    board_height = 100
+    board_height = 250
     board_x_margin = 90
     board_y_margin = 20
     board_color = (205, 170, 125)
     board_font_size = 20
     board_text_left_margin = 20
     board_text_top_margin = 20
+    board_text_line_spacing = 10
 
     def init():
         Settings.field_x_spacing = Settings.screen_width // 6
