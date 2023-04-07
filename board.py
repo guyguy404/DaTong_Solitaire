@@ -11,14 +11,15 @@ class Board(Sprite):
         super().__init__()
         # 暂时采用纯色背景
         self.game = game
+        self.settings = Settings()
         self.screen = pygame.display.get_surface()
-        self.image = Surface((Settings.board_width, Settings.board_height))
-        self.image.fill(Settings.board_color)
+        self.image = Surface((self.settings.board.width, self.settings.board.height))
+        self.image.fill(self.settings.board.color)
         self.rect = self.image.get_rect(
-            x=Settings.board_x_margin,
-            y=Settings.board_y_margin
+            x=self.settings.board.left_margin,
+            y=self.settings.board.top_margin
         )
-        self.font = pygame.font.Font(Settings.font_path, Settings.board_font_size)
+        self.font = pygame.font.Font(self.settings.font_path, self.settings.board.font_size)
         
         self.curr_player_text = self.font.render(
             "当前玩家：0",
@@ -26,8 +27,8 @@ class Board(Sprite):
             (10, 10, 10)
         )
         self.curr_player_text_rect = self.curr_player_text.get_rect(
-            x=Settings.board_text_left_margin,
-            y=Settings.board_text_top_margin
+            x=self.settings.board.text.left_margin,
+            y=self.settings.board.text.top_margin
         )
         
         self.score_prompt_text = self.font.render(
@@ -36,8 +37,8 @@ class Board(Sprite):
             (10, 10, 10)
         )
         self.score_prompt_text_rect = self.score_prompt_text.get_rect(
-            x=Settings.board_text_left_margin,
-            y=self.curr_player_text_rect.bottom + Settings.board_text_line_spacing
+            x=self.settings.board.text.left_margin,
+            y=self.curr_player_text_rect.bottom + self.settings.board.text.line_spacing
         )
         
         self.score_text:list[Surface] = []
@@ -50,8 +51,8 @@ class Board(Sprite):
             (10, 10, 10)
         )
         self.curr_player_text_rect = self.curr_player_text.get_rect(
-            x=Settings.board_text_left_margin,
-            y=Settings.board_text_top_margin
+            x=self.settings.board.text.left_margin,
+            y=self.settings.board.text.top_margin
         )
         
         self.score_text = []
@@ -63,9 +64,9 @@ class Board(Sprite):
                 (10, 10, 10)
             ))
             self.score_text_rect.append(self.score_text[i].get_rect(
-                x=Settings.board_text_left_margin,
-                y=self.score_prompt_text_rect.bottom + Settings.board_text_line_spacing + 
-                    i * (Settings.board_text_line_spacing + self.score_text[i].get_rect().height)
+                x=self.settings.board.text.left_margin,
+                y=self.score_prompt_text_rect.bottom + self.settings.board.text.line_spacing + 
+                    i * (self.settings.board.text.line_spacing + self.score_text[i].get_rect().height)
             ))
     
     def blitme(self):

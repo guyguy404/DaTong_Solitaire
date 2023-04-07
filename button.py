@@ -9,11 +9,14 @@ class Button:
             msg,
             width=200,
             height=50,
+            x=None,
+            y=None,
             button_color=(255, 255, 255),
             text_color=(0, 0, 0),
             font_size=20
         ):
         """初始化按钮的属性"""
+        self.settings = Settings()
         self.screen = pygame.display.get_surface()
         self.screen_rect = self.screen.get_rect()
         self.image = Surface((width, height))
@@ -24,11 +27,15 @@ class Button:
         self.height = height
         self.button_color = button_color
         self.text_color = text_color
-        self.font = pygame.font.Font(Settings.font_path, font_size)
+        self.font = pygame.font.Font(self.settings.font_path, font_size)
         
         # 创建按钮的rect对象，并使其居中
         self.rect = Rect(0, 0, self.width, self.height)
         self.rect.center = self.screen_rect.center
+        if x:
+            self.rect.centerx = x
+        if y:
+            self.rect.centery = y
         
         # 按钮的标签只需创建一次
         self._prep_msg(msg)

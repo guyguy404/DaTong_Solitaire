@@ -20,29 +20,30 @@ class DaTongSolitaire:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        Settings.screen_height = self.screen.get_rect().height
-        Settings.screen_width = self.screen.get_rect().width
-        Settings.init()
+        self.settings = Settings()
         pygame.display.set_caption("大通纸牌")
         self.game_stage = GameStage.start_menu
         
         self.play_button = Button(
-            msg=Settings.play_button_msg,
-            width=Settings.play_button_width,
-            height=Settings.play_button_height,
-            button_color=Settings.play_button_color,
-            text_color=Settings.play_button_text_color,
-            font_size=Settings.play_button_font_size
+            msg=self.settings.start_menu.play_button.msg,
+            width=self.settings.start_menu.play_button.width,
+            height=self.settings.start_menu.play_button.height,
+            x=self.settings.start_menu.play_button.centerx,
+            y=self.settings.start_menu.play_button.centery,
+            button_color=self.settings.start_menu.play_button.color,
+            text_color=self.settings.start_menu.play_button.text_color,
+            font_size=self.settings.start_menu.play_button.font_size
         )
         self.exit_button = Button(
-            msg=Settings.exit_button_msg,
-            width=Settings.exit_button_width,
-            height=Settings.exit_button_height,
-            button_color=Settings.exit_button_color,
-            text_color=Settings.exit_button_text_color,
-            font_size=Settings.exit_button_font_size
+            msg=self.settings.start_menu.exit_button.msg,
+            width=self.settings.start_menu.exit_button.width,
+            height=self.settings.start_menu.exit_button.height,
+            x=self.settings.start_menu.exit_button.centerx,
+            y=self.settings.start_menu.exit_button.centery,
+            button_color=self.settings.start_menu.exit_button.color,
+            text_color=self.settings.start_menu.exit_button.text_color,
+            font_size=self.settings.start_menu.exit_button.font_size
         )
-        self.exit_button.rect.y = self.play_button.rect.y + Settings.start_menu_button_spacing + Settings.play_button_height
         self.board = Board(self)
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
@@ -150,7 +151,7 @@ class DaTongSolitaire:
         if sorted_player_points_pairs[0][1] < 1:
             score_multiply_power = 2   # 大通
         for i, pair in enumerate(sorted_player_points_pairs):
-            self.score[pair[0]] += Settings.base_score[i] * score_multiply_power
+            self.score[pair[0]] += self.settings.base_score[i] * score_multiply_power
         
         self.game_stage = GameStage.game_over_menu
         self.game_over_menu = GameOverMenu(self, sorted_player_points_pairs)
@@ -216,7 +217,7 @@ class DaTongSolitaire:
 
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
-        self.screen.fill(Settings.bg_color)
+        self.screen.fill(self.settings.bg_color)
         if self.game_stage == GameStage.start_menu:
             self.play_button.blitme()
             self.exit_button.blitme()
@@ -239,73 +240,73 @@ class DaTongSolitaire:
         """更新所有卡牌的图像"""
         
         #  设置我的手牌位置
-        left_margin = (Settings.screen_width
-                       - (len(self.hand[0])-1) * Settings.hand_card_x_spacing
-                       - Settings.hand_card_width) // 2
+        left_margin = (self.settings.screen_width
+                       - (len(self.hand[0])-1) * self.settings.card.hand_xspacing
+                       - self.settings.card.width) // 2
         for i, card in enumerate(self.hand[0]):
-            card.rect.left = left_margin + i * Settings.hand_card_x_spacing
-            card.rect.bottom = Settings.screen_height + 0.6 * Settings.hand_card_height
+            card.rect.left = left_margin + i * self.settings.card.hand_xspacing
+            card.rect.bottom = self.settings.screen_height + 0.6 * self.settings.card.height
         
-        left_margin += len(self.hand[0]) * Settings.hand_card_x_spacing
+        left_margin += len(self.hand[0]) * self.settings.card.hand_xspacing
         for i, card in enumerate(self.trashed_cards[0]):
-            card.rect.left = left_margin + i * Settings.hand_card_x_spacing
-            card.rect.bottom = Settings.screen_height + 0.6 * Settings.hand_card_height
+            card.rect.left = left_margin + i * self.settings.card.hand_xspacing
+            card.rect.bottom = self.settings.screen_height + 0.6 * self.settings.card.height
         
         # 设置右侧玩家手牌位置
-        top_margin = (Settings.screen_height
-                       - (len(self.hand[1])-1) * Settings.hand_card_y_spacing
-                       - Settings.hand_card_height) // 2
+        top_margin = (self.settings.screen_height
+                       - (len(self.hand[1])-1) * self.settings.card.hand_yspacing
+                       - self.settings.card.height) // 2
         for i, card in enumerate(self.hand[1]):
-            card.rect.top = top_margin + i * Settings.hand_card_y_spacing
-            card.rect.right = Settings.screen_width + 0.6 * Settings.hand_card_width
+            card.rect.top = top_margin + i * self.settings.card.hand_yspacing
+            card.rect.right = self.settings.screen_width + 0.6 * self.settings.card.width
         
-        top_margin += len(self.hand[1]) * Settings.hand_card_y_spacing
+        top_margin += len(self.hand[1]) * self.settings.card.hand_yspacing
         for i, card in enumerate(self.trashed_cards[1]):
-            card.rect.top = top_margin + i * Settings.hand_card_y_spacing
-            card.rect.right = Settings.screen_width + 0.6 * Settings.hand_card_width
+            card.rect.top = top_margin + i * self.settings.card.hand_yspacing
+            card.rect.right = self.settings.screen_width + 0.6 * self.settings.card.width
         
         # 设置对侧玩家的手牌位置
-        right_margin = (Settings.screen_width
-                       - (len(self.hand[2])-1) * Settings.hand_card_x_spacing
-                       - Settings.hand_card_width) // 2
+        right_margin = (self.settings.screen_width
+                       - (len(self.hand[2])-1) * self.settings.card.hand_xspacing
+                       - self.settings.card.width) // 2
         for i, card in enumerate(self.hand[2]):
-            card.rect.right = Settings.screen_width - (right_margin + i * Settings.hand_card_x_spacing)
-            card.rect.top = 0 - 0.6 * Settings.hand_card_height
+            card.rect.right = self.settings.screen_width - (right_margin + i * self.settings.card.hand_xspacing)
+            card.rect.top = 0 - 0.6 * self.settings.card.height
         
-        right_margin += len(self.hand[2]) * Settings.hand_card_x_spacing
+        right_margin += len(self.hand[2]) * self.settings.card.hand_xspacing
         for i, card in enumerate(self.trashed_cards[2]):
-            card.rect.right = Settings.screen_width - (right_margin + i * Settings.hand_card_x_spacing)
-            card.rect.top = 0 - 0.6 * Settings.hand_card_height
+            card.rect.right = self.settings.screen_width - (right_margin + i * self.settings.card.hand_xspacing)
+            card.rect.top = 0 - 0.6 * self.settings.card.height
         
         # 设置左侧玩家手牌位置
-        top_margin = (Settings.screen_height
-                       - (len(self.hand[3])-1) * Settings.hand_card_y_spacing
-                       - Settings.hand_card_height) // 2
+        top_margin = (self.settings.screen_height
+                       - (len(self.hand[3])-1) * self.settings.card.hand_yspacing
+                       - self.settings.card.height) // 2
         for i, card in enumerate(self.hand[3]):
-            card.rect.top = top_margin + i * Settings.hand_card_y_spacing
-            card.rect.left = 0 - 0.6 * Settings.hand_card_width
+            card.rect.top = top_margin + i * self.settings.card.hand_yspacing
+            card.rect.left = 0 - 0.6 * self.settings.card.width
         
-        top_margin += len(self.hand[3]) * Settings.hand_card_y_spacing
+        top_margin += len(self.hand[3]) * self.settings.card.hand_yspacing
         for i, card in enumerate(self.trashed_cards[3]):
-            card.rect.top = top_margin + i * Settings.hand_card_y_spacing
-            card.rect.left = 0 - 0.6 * Settings.hand_card_width
+            card.rect.top = top_margin + i * self.settings.card.hand_yspacing
+            card.rect.left = 0 - 0.6 * self.settings.card.width
             
         # 设置场上卡牌位置
         for i in range(4):
             for j, card in enumerate(reversed(self.played_cards_greater_7[i])):
-                card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
+                card.rect.centerx = self.settings.field.left_margin + i * self.settings.field.xspacing
                 n = len(self.played_cards_greater_7[i])
-                card.rect.centery = Settings.screen_height // 2 - (n-j) * Settings.field_y_spacing
+                card.rect.centery = self.settings.screen_height // 2 - (n-j) * self.settings.field.yspacing
 
         for i in range(4):
             for j, card in enumerate(self.played_cards_7[i]):
-                card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
-                card.rect.centery = Settings.screen_height // 2
+                card.rect.centerx = self.settings.field.left_margin + i * self.settings.field.xspacing
+                card.rect.centery = self.settings.screen_height // 2
         
         for i in range(4):
             for j, card in enumerate(self.played_cards_less_7[i]):
-                card.rect.centerx = Settings.field_x_margin + i * Settings.field_x_spacing
-                card.rect.centery = Settings.screen_height // 2 + (j+1) * Settings.field_y_spacing
+                card.rect.centerx = self.settings.field.left_margin + i * self.settings.field.xspacing
+                card.rect.centery = self.settings.screen_height // 2 + (j+1) * self.settings.field.yspacing
         
         # 检测鼠标是否聚焦手牌
         self.focused_card = None
@@ -315,9 +316,9 @@ class DaTongSolitaire:
                 if card.rect.collidepoint(pos):
                     self.focused_card = card
                     if i == 0:
-                        card.rect.bottom = Settings.screen_height
+                        card.rect.bottom = self.settings.screen_height
                     elif i == 1:
-                        card.rect.right = Settings.screen_width
+                        card.rect.right = self.settings.screen_width
                     elif i == 2:
                         card.rect.top = 0
                     elif i == 3:
@@ -346,15 +347,15 @@ class DaTongSolitaire:
             for card in hand:
                 if card.info in self.playable_cards and card in self.hand[self.current_player]:
                     frame_rect = card.rect.inflate(
-                            Settings.playable_card_frame_width,
-                            Settings.playable_card_frame_width
+                            self.settings.card.playable_frame.width,
+                            self.settings.card.playable_frame.width
                         )
                     pygame.draw.rect(
                             self.screen,
-                            Settings.playable_card_frame_color,
+                            self.settings.card.playable_frame.color,
                             frame_rect,
-                            width=Settings.playable_card_frame_width,
-                            border_radius=Settings.playable_card_frame_border_radius
+                            width=self.settings.card.playable_frame.width,
+                            border_radius=self.settings.card.playable_frame.border_radius
                         )
                 card.blitme()
         

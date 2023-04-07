@@ -8,23 +8,24 @@ class GameOverMenu(Sprite):
     def __init__(self, game, sorted_player_points_pairs):
         super().__init__()
         self.game = game
+        self.settings = Settings()
         self.screen = pygame.display.get_surface()
-        self.image = Surface((Settings.game_over_menu_width, Settings.game_over_menu_height))
-        self.image.fill(Settings.game_over_menu_color)
+        self.image = Surface((self.settings.game_over_menu.width, self.settings.game_over_menu.height))
+        self.image.fill(self.settings.game_over_menu.color)
         self.rect = self.image.get_rect()
         self.rect.center = self.screen.get_rect().center
-        self.title_font = pygame.font.Font(Settings.font_path, Settings.game_over_menu_title_font_size)
-        self.content_font = pygame.font.Font(Settings.font_path, Settings.game_over_menu_content_font_size)
+        self.title_font = pygame.font.Font(self.settings.font_path, self.settings.game_over_menu.title.font_size)
+        self.content_font = pygame.font.Font(self.settings.font_path, self.settings.game_over_menu.content.font_size)
         self.winner = sorted_player_points_pairs[0][0]
         
         self.title_text = self.title_font.render(
             " 玩家" + str(self.winner) + "胜利！",
             True,
-            Settings.game_over_menu_title_color
+            self.settings.game_over_menu.title.color
         )
         self.title_rect = self.title_text.get_rect(
             centerx=self.rect.width // 2,
-            y=Settings.game_over_menu_title_top_margin
+            y=self.settings.game_over_menu.title.top_margin
         )
         
         self.content_text:list[Surface] = []
@@ -33,13 +34,15 @@ class GameOverMenu(Sprite):
             player = sorted_player_points_pairs[i][0]
             point = int(sorted_player_points_pairs[i][1])
             self.content_text.append(self.content_font.render(
-                f"玩家{player}：{point}点 —— {Settings.base_score[i]:+}分 -> {self.game.score[player]:+}分",
+                f"玩家{player}：{point}点 —— {self.settings.base_score[i]:+}分 -> {self.game.score[player]:+}分",
                 True,
-                Settings.game_over_menu_content_color
+                self.settings.game_over_menu.content.color
             ))
             self.content_rect.append(self.content_text[i].get_rect(
                 centerx=self.rect.width // 2,
-                y=Settings.game_over_menu_content_top_margin + i * (self.content_text[0].get_rect().height + Settings.game_over_menu_content_line_spacing)
+                y=self.settings.game_over_menu.content.top_margin 
+                    + i * (self.content_text[0].get_rect().height 
+                           + self.settings.game_over_menu.content.line_spacing)
             ))
     
     def update(self):

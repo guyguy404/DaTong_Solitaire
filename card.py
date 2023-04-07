@@ -8,12 +8,13 @@ class Card(Sprite):
     def __init__(self, suit, rank, *group):
         """初始化卡牌并设置其初始位置"""
         super().__init__(*group)
+        self.settings = Settings()
         self.screen = pygame.display.get_surface()
         # 加载卡牌图像
         self.image = pygame.image.load('images/cards/' + self._card_filename(suit, rank))
         # 原始图像太大了，需要适当缩小
         self.size = self.image.get_size()
-        self.size = (self.size[0] * Settings.load_card_scale, self.size[1] * Settings.load_card_scale)
+        self.size = (self.size[0] * self.settings.card.load_card_scale, self.size[1] * self.settings.card.load_card_scale)
         self.image = pygame.transform.scale(self.image, self.size)
         self.image = self.image.convert()
         # 获取图像对应的矩形
@@ -32,7 +33,7 @@ class Card(Sprite):
         """根据参数生成对应的卡牌图像名称"""
         rank_str = ''
         if type(suit) == int:
-            suit = Settings.suits[suit]
+            suit = self.settings.card.suits[suit]
         
         if rank >= 2 and rank <= 10:
             rank_str = str(rank)
