@@ -9,7 +9,6 @@ from singleton import Singleton
 from settings import Settings
 from card import Card
 from board import Board
-from button import Button
 from game_stage import GameStage
 from start_menu import StartMenu
 from game_over_menu import GameOverMenu
@@ -28,27 +27,6 @@ class DaTongSolitaire(Singleton):
         self.score:list[int] = [0, 0, 0, 0]
         self.start_menu = StartMenu(self)
         
-        # self.play_button = Button(
-        #     msg=self.settings.start_menu.play_button.msg,
-        #     width=self.settings.start_menu.play_button.width,
-        #     height=self.settings.start_menu.play_button.height,
-        #     x=self.settings.start_menu.play_button.centerx,
-        #     y=self.settings.start_menu.play_button.centery,
-        #     button_color=self.settings.start_menu.play_button.color,
-        #     text_color=self.settings.start_menu.play_button.text_color,
-        #     font_size=self.settings.start_menu.play_button.font_size
-        # )
-        # self.exit_button = Button(
-        #     msg=self.settings.start_menu.exit_button.msg,
-        #     width=self.settings.start_menu.exit_button.width,
-        #     height=self.settings.start_menu.exit_button.height,
-        #     x=self.settings.start_menu.exit_button.centerx,
-        #     y=self.settings.start_menu.exit_button.centery,
-        #     button_color=self.settings.start_menu.exit_button.color,
-        #     text_color=self.settings.start_menu.exit_button.text_color,
-        #     font_size=self.settings.start_menu.exit_button.font_size
-        # )
-    
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
         self.game_stage = GameStage.playing
@@ -82,7 +60,7 @@ class DaTongSolitaire(Singleton):
         self.end_turn = False
     
     def new_test_game(self):
-        """重置游戏的所有状态，以开始一场新的测试游戏，测试游戏中每名玩家只有一张牌"""
+        """重置游戏的所有状态，以开始一场新的测试游戏，测试游戏中每名玩家只有一张牌，以便快速测试游戏结束的场景"""
         self.game_stage = GameStage.playing
         self.board = Board(self)
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
@@ -100,8 +78,6 @@ class DaTongSolitaire(Singleton):
         for i in range(4):
             hand_cards = cards[i*1:(i+1)*1]
             hand_cards.sort(key=cmp_to_key(Card.cmp))
-            # if (0, 7) in hand_cards:
-            #     start_player = i
             start_player = 0
             for card_tuple in hand_cards:
                 Card(*card_tuple, self.hand[i])
