@@ -229,7 +229,7 @@ class DaTongSolitaire(Singleton):
             self.score[pair[0]] += self.settings.base_score[i] * score_multiply_power
         
         self.game_stage = GameStage.game_over_menu
-        self.game_over_menu = GameOverMenu(self, sorted_player_points_pairs)
+        self.game_over_menu = GameOverMenu(self, sorted_player_points_pairs, score_multiply_power)
     
     def _on_focused_card_clicked(self):
         """当聚焦的卡牌被点击时"""

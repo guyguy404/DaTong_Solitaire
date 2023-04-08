@@ -6,7 +6,7 @@ from button import Button
 
 class GameOverMenu(Sprite):
     """游戏结束时显示的菜单"""
-    def __init__(self, game, sorted_player_points_pairs):
+    def __init__(self, game, sorted_player_points_pairs, score_multiply_power):
         super().__init__()
         self.game = game
         self.settings = Settings()
@@ -35,7 +35,7 @@ class GameOverMenu(Sprite):
             player = sorted_player_points_pairs[i][0]
             point = int(sorted_player_points_pairs[i][1])
             self.content_text.append(self.content_font.render(
-                f"玩家{player}：{point}点 —— {self.settings.base_score[i]:+}分 -> {self.game.score[player]:+}分",
+                f"玩家{player}：{point}点 —— {(self.settings.base_score[i]*score_multiply_power):+}分 -> {self.game.score[player]:+}分",
                 True,
                 self.settings.game_over_menu.content.color
             ))
