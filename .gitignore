@@ -1,3 +1,5 @@
 __pycache__/
 dts_env/
 .vscode/
+build/
+dist/
