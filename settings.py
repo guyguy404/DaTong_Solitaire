@@ -30,8 +30,15 @@ class Settings(Singleton):
         """开始界面的设置类"""
         button_yspacing = 150
         def __init__(self, surf_width, surf_height):
+            self.title = Settings.StartMenu.Title(surf_width, surf_height)
             self.play_button = Settings.StartMenu.PlayButton(surf_width, surf_height)
             self.exit_button = Settings.StartMenu.ExitButton(surf_width, surf_height)
+        
+        class Title:
+            """开始界面标题图片的设置类"""
+            def __init__(self, surf_width, surf_height):
+                self.centerx = surf_width // 2
+                self.centery = int(surf_height * 0.3)
             
         class Button:
             """开始界面中所有按钮设置信息的基类"""

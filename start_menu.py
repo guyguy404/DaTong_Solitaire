@@ -15,6 +15,12 @@ class StartMenu(Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.screen.get_rect().center
         
+        self.title = pygame.image.load('images/title.png')
+        self.title_rect = self.title.get_rect(
+            centerx=self.settings.start_menu.title.centerx,
+            centery=self.settings.start_menu.title.centery
+        )
+        
         self.play_button = Button(
             msg=self.settings.start_menu.play_button.msg,
             width=self.settings.start_menu.play_button.width,
@@ -41,6 +47,7 @@ class StartMenu(Sprite):
     
     def blitme(self):
         menu = self.image.copy()
+        menu.blit(self.title, self.title_rect)
         self.play_button.blitme(menu)
         self.exit_button.blitme(menu)
         self.screen.blit(menu, self.rect)
