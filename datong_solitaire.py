@@ -12,6 +12,7 @@ from board import Board
 from game_stage import GameStage
 from start_menu import StartMenu
 from game_over_menu import GameOverMenu
+from utils import darken
 
 class DaTongSolitaire(Singleton):
     """管理游戏资源和行为的类"""
@@ -21,12 +22,13 @@ class DaTongSolitaire(Singleton):
         pygame.init()
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        self.settings = Settings()
+        self.settings = Settings(game=self)
         pygame.display.set_caption("大通纸牌")
         self.game_stage = GameStage.start_menu
         self.score:list[int] = [0, 0, 0, 0]
         self.start_menu = StartMenu(self)
-        
+        Card._load_card_back_image()
+    
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
         self.game_stage = GameStage.playing
@@ -49,7 +51,12 @@ class DaTongSolitaire(Singleton):
             if (0, 7) in hand_cards:
                 start_player = i
             for card_tuple in hand_cards:
-                Card(*card_tuple, self.hand[i])
+                Card(*card_tuple, i, self.hand[i])
+        
+        # 将非己方手牌设置为不可见
+        for i in range(1, 4):
+            for card in self.hand[i]:
+                card.to_invisible()
         
         # 状态
         self.focused_card: Card = None
@@ -58,10 +65,10 @@ class DaTongSolitaire(Singleton):
         self.current_player = start_player
         self.can_play_card = True   # 根据规则，当前玩家是否能出牌
         self.end_turn = False
-    
+        
     def new_test_game(self):
-        """重置游戏的所有状态，以开始一场新的测试游戏，测试游戏中每名玩家只有一张牌，以便快速测试游戏结束的场景"""
-        self.game_stage = GameStage.playing
+        """重置游戏的所有状态，以开始一场新的测试游戏"""
+        self.game_stage = GameStage.testing
         self.board = Board(self)
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
@@ -72,23 +79,55 @@ class DaTongSolitaire(Singleton):
         # 生成卡牌，洗牌并发牌
         cards = []
         for i in range(4):
-            for j in range(1, 1+1):
+            for j in range(1, 13+1):
                 cards.append((i, j))
         shuffle(cards)
         for i in range(4):
-            hand_cards = cards[i*1:(i+1)*1]
+            hand_cards = cards[i*13:(i+1)*13]
             hand_cards.sort(key=cmp_to_key(Card.cmp))
-            start_player = 0
+            if (0, 7) in hand_cards:
+                start_player = i
             for card_tuple in hand_cards:
-                Card(*card_tuple, self.hand[i])
+                Card(*card_tuple, i, self.hand[i])
         
         # 状态
         self.focused_card: Card = None
         self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出黑桃7
         self.start_player = start_player
         self.current_player = start_player
-        self.can_play_card = False   # 根据规则，当前玩家是否能出牌
+        self.can_play_card = True   # 根据规则，当前玩家是否能出牌
         self.end_turn = False
+    
+    # def new_test_game_one_card_per_player(self):
+    #     """重置游戏的所有状态，以开始一场新的测试游戏，测试游戏中每名玩家只有一张牌，以便快速测试游戏结束的场景"""
+    #     self.game_stage = GameStage.testing
+    #     self.board = Board(self)
+    #     self.hand: list[Group] = [Group(), Group(), Group(), Group()]
+    #     self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
+    #     self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
+    #     self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
+    #     self.played_cards_7: list[list[Card]] = [[], [], [], []]
+        
+    #     # 生成卡牌，洗牌并发牌
+    #     cards = []
+    #     for i in range(4):
+    #         for j in range(1, 1+1):
+    #             cards.append((i, j))
+    #     shuffle(cards)
+    #     for i in range(4):
+    #         hand_cards = cards[i*1:(i+1)*1]
+    #         hand_cards.sort(key=cmp_to_key(Card.cmp))
+    #         start_player = 0
+    #         for card_tuple in hand_cards:
+    #             Card(*card_tuple, self.hand[i])
+        
+    #     # 状态
+    #     self.focused_card: Card = None
+    #     self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出黑桃7
+    #     self.start_player = start_player
+    #     self.current_player = start_player
+    #     self.can_play_card = False   # 根据规则，当前玩家是否能出牌
+    #     self.end_turn = False
     
     def run_game(self):
         """开始游戏的主循环"""
@@ -103,6 +142,11 @@ class DaTongSolitaire(Singleton):
         if self.game_stage == GameStage.start_menu:
             pass
         elif self.game_stage == GameStage.playing:
+            self.board.update()
+            self._update_cards()
+            if self.end_turn:
+                self._next_turn()
+        elif self.game_stage == GameStage.testing:
             self.board.update()
             self._update_cards()
             if self.end_turn:
@@ -125,9 +169,15 @@ class DaTongSolitaire(Singleton):
                         mouse_pos = pygame.mouse.get_pos()
                         if self.start_menu.play_button.rect.collidepoint(mouse_pos):
                             self.new_game()
+                        elif self.start_menu.test_button.rect.collidepoint(mouse_pos):
+                            self.new_test_game()
                         elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
                             sys.exit()
                     elif self.game_stage == GameStage.playing:
+                        # TODO
+                        if self.focused_card:
+                            self._on_focused_card_clicked()
+                    elif self.game_stage == GameStage.testing:
                         if self.focused_card:
                             self._on_focused_card_clicked()
                     elif self.game_stage == GameStage.game_over_menu:
@@ -197,6 +247,7 @@ class DaTongSolitaire(Singleton):
     
     def _play_card(self, card: Card):
         """当前玩家打出指定的卡牌"""
+        card.to_visible()
         # 将此牌从手中移动到场上
         if card.rank < 7:
             self.played_cards_less_7[card.suit].append(card)
@@ -208,6 +259,7 @@ class DaTongSolitaire(Singleton):
         
         # 更新可打出牌的列表
         self.playable_cards.remove(card.info)
+        card.playable = False
         if card.info == (0, 7):
             for i in range(1, 4):
                 self.playable_cards.append((i, 7))
@@ -224,6 +276,11 @@ class DaTongSolitaire(Singleton):
             self.playable_cards.append((card.suit, card.rank + 1))
         else:
             raise Exception("We met a mistake in updating playable_cards!")
+
+        for hand in self.hand:
+            for card in hand:
+                if card.info in self.playable_cards:
+                    card.playable = True
         
         self.end_turn = True
     
@@ -234,8 +291,7 @@ class DaTongSolitaire(Singleton):
         self.hand[self.current_player].remove(card)
         
         # 改变被弃牌的UI
-        pixels = pygame.surfarray.pixels3d(card.image)
-        pixels //= 2
+        card.to_discard_UI()
         
         self.end_turn = True
             
@@ -248,13 +304,14 @@ class DaTongSolitaire(Singleton):
         elif self.game_stage == GameStage.playing:
             self.board.blitme()
             self._draw_cards()
+        elif self.game_stage == GameStage.testing:
+            self.board.blitme()
+            self._draw_cards()
         elif self.game_stage == GameStage.game_over_menu:
             self.board.blitme()
             self._draw_cards()
             # 将牌桌作为背景变暗，以凸显游戏结束界面
-            pixels = pygame.surfarray.pixels3d(self.screen)
-            pixels //= 2
-            del pixels
+            darken(self.screen)
             # 背景变暗后再绘制游戏结束界面
             self.game_over_menu.blitme()
         
@@ -337,8 +394,10 @@ class DaTongSolitaire(Singleton):
         pos = pygame.mouse.get_pos()
         for i, hand in enumerate(self.hand):
             for card in reversed(hand.sprites()):
-                if card.rect.collidepoint(pos):
+                # 检测鼠标是否聚焦手牌
+                if not self.focused_card and card.rect.collidepoint(pos):
                     self.focused_card = card
+                    card.focused = True
                     if i == 0:
                         card.rect.bottom = self.settings.screen_height
                     elif i == 1:
@@ -349,7 +408,14 @@ class DaTongSolitaire(Singleton):
                         card.rect.left = 0
                     else:
                         raise Exception("Too many hand!")
-                    break
+                else:
+                    card.focused = False
+                
+                # # 检测卡牌是否可打出
+                # if card.info in self.playable_cards and card in self.hand[self.current_player]:
+                #     card.playable = True
+                # else:
+                #     card.playable = False
         
     def _draw_cards(self):
         """在屏幕上绘制所有卡牌"""
@@ -369,18 +435,20 @@ class DaTongSolitaire(Singleton):
         # 显示手牌
         for hand in self.hand:
             for card in hand:
-                if card.info in self.playable_cards and card in self.hand[self.current_player]:
-                    frame_rect = card.rect.inflate(
-                            self.settings.card.playable_frame.width,
-                            self.settings.card.playable_frame.width
-                        )
-                    pygame.draw.rect(
-                            self.screen,
-                            self.settings.card.playable_frame.color,
-                            frame_rect,
-                            width=self.settings.card.playable_frame.width,
-                            border_radius=self.settings.card.playable_frame.border_radius
-                        )
+                # if card.info in self.playable_cards and card in self.hand[self.current_player]:
+                #     card.playable = True
+                # if card.info in self.playable_cards and card in self.hand[self.current_player]:
+                #     frame_rect = card.rect.inflate(
+                #             self.settings.card.playable_frame.width,
+                #             self.settings.card.playable_frame.width
+                #         )
+                #     pygame.draw.rect(
+                #             self.screen,
+                #             self.settings.card.playable_frame.color,
+                #             frame_rect,
+                #             width=self.settings.card.playable_frame.width,
+                #             border_radius=self.settings.card.playable_frame.border_radius
+                #         )
                 card.blitme()
         
         # 显示弃牌堆

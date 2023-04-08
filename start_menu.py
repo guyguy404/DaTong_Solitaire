@@ -31,6 +31,16 @@ class StartMenu(Sprite):
             text_color=self.settings.start_menu.play_button.text_color,
             font_size=self.settings.start_menu.play_button.font_size
         )
+        self.test_button = Button(
+            msg=self.settings.start_menu.test_button.msg,
+            width=self.settings.start_menu.test_button.width,
+            height=self.settings.start_menu.test_button.height,
+            x=self.settings.start_menu.test_button.centerx,
+            y=self.settings.start_menu.test_button.centery,
+            button_color=self.settings.start_menu.test_button.color,
+            text_color=self.settings.start_menu.test_button.text_color,
+            font_size=self.settings.start_menu.test_button.font_size
+        )
         self.exit_button = Button(
             msg=self.settings.start_menu.exit_button.msg,
             width=self.settings.start_menu.exit_button.width,
@@ -49,5 +59,6 @@ class StartMenu(Sprite):
         menu = self.image.copy()
         menu.blit(self.title, self.title_rect)
         self.play_button.blitme(menu)
+        self.test_button.blitme(menu)
         self.exit_button.blitme(menu)
         self.screen.blit(menu, self.rect)

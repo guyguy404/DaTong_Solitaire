@@ -4,8 +4,18 @@ from singleton import Singleton
 class Settings(Singleton):
     """存储游戏中所有设置的类"""
     
-    def __init__(self):
+    has_inited = False
+    
+    def __init__(self, game=None):
         """设置类的初始化（需要在游戏开始获取屏幕大小后才能初始化）"""
+        if Settings.has_inited:
+            return
+        Settings.has_inited = True
+        
+        if game:
+            self.game = game
+        else:
+            raise Exception("No game provided when initializing Settings class!")
         screen_rect = pygame.display.get_surface().get_rect()
         self.screen_width = screen_rect.width
         self.screen_height = screen_rect.height
@@ -32,6 +42,7 @@ class Settings(Singleton):
         def __init__(self, surf_width, surf_height):
             self.title = Settings.StartMenu.Title(surf_width, surf_height)
             self.play_button = Settings.StartMenu.PlayButton(surf_width, surf_height)
+            self.test_button = Settings.StartMenu.TestButton(surf_width, surf_height)
             self.exit_button = Settings.StartMenu.ExitButton(surf_width, surf_height)
         
         class Title:
@@ -57,13 +68,21 @@ class Settings(Singleton):
                 self.centerx = surf_width // 2
                 self.centery = surf_height // 2
             
+        class TestButton(Button):
+            """开始界面中的“测试游戏”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "测试游戏"
+                self.centerx = surf_width // 2
+                self.centery = surf_height // 2 + Settings.StartMenu.button_yspacing
+        
         class ExitButton(Button):
             """开始界面中的“退出游戏”按钮设置类"""
             def __init__(self, surf_width, surf_height):
                 super().__init__()
                 self.msg = "退出游戏"
                 self.centerx = surf_width // 2
-                self.centery = surf_height // 2 + Settings.StartMenu.button_yspacing
+                self.centery = surf_height // 2 + 2 * Settings.StartMenu.button_yspacing
             
     class Card:
         """卡牌相关的设置类"""
