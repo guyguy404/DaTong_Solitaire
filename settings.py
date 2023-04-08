@@ -1,6 +1,7 @@
 import pygame
+from singleton import Singleton
 
-class Settings:
+class Settings(Singleton):
     """存储游戏中所有设置的类"""
     
     def __init__(self):

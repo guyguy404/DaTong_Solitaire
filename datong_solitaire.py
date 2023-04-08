@@ -5,6 +5,7 @@ from pygame.sprite import Sprite, Group
 from random import shuffle
 from functools import cmp_to_key
 
+from singleton import Singleton
 from settings import Settings
 from card import Card
 from board import Board
@@ -12,7 +13,7 @@ from button import Button
 from game_stage import GameStage
 from game_over_menu import GameOverMenu
 
-class DaTongSolitaire:
+class DaTongSolitaire(Singleton):
     """管理游戏资源和行为的类"""
     
     def __init__(self):
