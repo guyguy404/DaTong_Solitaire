@@ -2,6 +2,7 @@ import pygame
 from pygame import Surface, Rect
 from pygame.sprite import Sprite
 from settings import Settings
+from button import Button
 
 class GameOverMenu(Sprite):
     """游戏结束时显示的菜单"""
@@ -44,6 +45,26 @@ class GameOverMenu(Sprite):
                     + i * (self.content_text[0].get_rect().height 
                            + self.settings.game_over_menu.content.line_spacing)
             ))
+        self.replay_button = Button(
+            msg=self.settings.game_over_menu.replay_button.msg,
+            width=self.settings.game_over_menu.replay_button.width,
+            height=self.settings.game_over_menu.replay_button.height,
+            x=self.settings.game_over_menu.replay_button.centerx,
+            y=self.settings.game_over_menu.replay_button.centery,
+            button_color=self.settings.game_over_menu.replay_button.color,
+            text_color=self.settings.game_over_menu.replay_button.text_color,
+            font_size=self.settings.game_over_menu.replay_button.font_size
+        )
+        self.exit_button = Button(
+            msg=self.settings.game_over_menu.exit_button.msg,
+            width=self.settings.game_over_menu.exit_button.width,
+            height=self.settings.game_over_menu.exit_button.height,
+            x=self.settings.game_over_menu.exit_button.centerx,
+            y=self.settings.game_over_menu.exit_button.centery,
+            button_color=self.settings.game_over_menu.exit_button.color,
+            text_color=self.settings.game_over_menu.exit_button.text_color,
+            font_size=self.settings.game_over_menu.exit_button.font_size
+        )
     
     def update(self):
         pass
@@ -53,4 +74,6 @@ class GameOverMenu(Sprite):
         menu.blit(self.title_text, self.title_rect)
         for i in range(len(self.content_text)):
             menu.blit(self.content_text[i], self.content_rect[i])
+        self.replay_button.blitme(menu)
+        self.exit_button.blitme(menu)
         self.screen.blit(menu, self.rect)

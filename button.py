@@ -46,7 +46,9 @@ class Button:
         self.msg_image_rect = self.msg_image.get_rect()
         self.msg_image_rect.center = (self.rect.width // 2, self.rect.height // 2)
     
-    def blitme(self):
+    def blitme(self, surface: Surface=None):
+        if surface == None:
+            surface = self.screen
         button = self.image.copy()
         button.blit(self.msg_image, self.msg_image_rect)
-        self.screen.blit(button, self.rect)
+        surface.blit(button, self.rect)

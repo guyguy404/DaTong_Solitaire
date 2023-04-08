@@ -112,6 +112,8 @@ class Settings(Singleton):
             self.color = Settings.Color.burlywood
             self.title = Settings.GameOverMenu.Title()
             self.content = Settings.GameOverMenu.Content()
+            self.replay_button = Settings.GameOverMenu.ReplayButton(self.width, self.height)
+            self.exit_button = Settings.GameOverMenu.ExitButton(self.width, self.height)
         
         class Title:
             
@@ -127,3 +129,28 @@ class Settings(Singleton):
                 self.color = Settings.Color.black
                 self.top_margin = 160
                 self.line_spacing = 20
+        
+        class Button:
+            """游戏结束界面中所有按钮设置信息的基类"""
+            def __init__(self):
+                self.width = 200
+                self.height = 100
+                self.color = Settings.Color.white
+                self.text_color = Settings.Color.black
+                self.font_size = 32
+                
+        class ReplayButton(Button):
+            """游戏结束界面中“再来一局”按钮的设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "再来一局"
+                self.centerx = surf_width // 2
+                self.centery = int(surf_height * 0.65)
+            
+        class ExitButton(Button):
+            """游戏结束界面中“退出游戏”按钮的设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "退出游戏"
+                self.centerx = surf_width // 2
+                self.centery = int(surf_height * 0.85)

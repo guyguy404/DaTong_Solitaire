@@ -11,6 +11,7 @@ from card import Card
 from board import Board
 from button import Button
 from game_stage import GameStage
+from start_menu import StartMenu
 from game_over_menu import GameOverMenu
 
 class DaTongSolitaire(Singleton):
@@ -24,34 +25,39 @@ class DaTongSolitaire(Singleton):
         self.settings = Settings()
         pygame.display.set_caption("大通纸牌")
         self.game_stage = GameStage.start_menu
+        self.score:list[int] = [0, 0, 0, 0]
+        self.start_menu = StartMenu(self)
         
-        self.play_button = Button(
-            msg=self.settings.start_menu.play_button.msg,
-            width=self.settings.start_menu.play_button.width,
-            height=self.settings.start_menu.play_button.height,
-            x=self.settings.start_menu.play_button.centerx,
-            y=self.settings.start_menu.play_button.centery,
-            button_color=self.settings.start_menu.play_button.color,
-            text_color=self.settings.start_menu.play_button.text_color,
-            font_size=self.settings.start_menu.play_button.font_size
-        )
-        self.exit_button = Button(
-            msg=self.settings.start_menu.exit_button.msg,
-            width=self.settings.start_menu.exit_button.width,
-            height=self.settings.start_menu.exit_button.height,
-            x=self.settings.start_menu.exit_button.centerx,
-            y=self.settings.start_menu.exit_button.centery,
-            button_color=self.settings.start_menu.exit_button.color,
-            text_color=self.settings.start_menu.exit_button.text_color,
-            font_size=self.settings.start_menu.exit_button.font_size
-        )
+        # self.play_button = Button(
+        #     msg=self.settings.start_menu.play_button.msg,
+        #     width=self.settings.start_menu.play_button.width,
+        #     height=self.settings.start_menu.play_button.height,
+        #     x=self.settings.start_menu.play_button.centerx,
+        #     y=self.settings.start_menu.play_button.centery,
+        #     button_color=self.settings.start_menu.play_button.color,
+        #     text_color=self.settings.start_menu.play_button.text_color,
+        #     font_size=self.settings.start_menu.play_button.font_size
+        # )
+        # self.exit_button = Button(
+        #     msg=self.settings.start_menu.exit_button.msg,
+        #     width=self.settings.start_menu.exit_button.width,
+        #     height=self.settings.start_menu.exit_button.height,
+        #     x=self.settings.start_menu.exit_button.centerx,
+        #     y=self.settings.start_menu.exit_button.centery,
+        #     button_color=self.settings.start_menu.exit_button.color,
+        #     text_color=self.settings.start_menu.exit_button.text_color,
+        #     font_size=self.settings.start_menu.exit_button.font_size
+        # )
+    
+    def new_game(self):
+        """重置游戏的所有状态，以开始一场新的游戏"""
+        self.game_stage = GameStage.playing
         self.board = Board(self)
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_7: list[list[Card]] = [[], [], [], []]
-        self.score:list[int] = [0, 0, 0, 0]
         
         # 生成卡牌，洗牌并发牌
         cards = []
@@ -73,6 +79,39 @@ class DaTongSolitaire(Singleton):
         self.start_player = start_player
         self.current_player = start_player
         self.can_play_card = True   # 根据规则，当前玩家是否能出牌
+        self.end_turn = False
+    
+    def new_test_game(self):
+        """重置游戏的所有状态，以开始一场新的测试游戏，测试游戏中每名玩家只有一张牌"""
+        self.game_stage = GameStage.playing
+        self.board = Board(self)
+        self.hand: list[Group] = [Group(), Group(), Group(), Group()]
+        self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
+        self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
+        self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
+        self.played_cards_7: list[list[Card]] = [[], [], [], []]
+        
+        # 生成卡牌，洗牌并发牌
+        cards = []
+        for i in range(4):
+            for j in range(1, 1+1):
+                cards.append((i, j))
+        shuffle(cards)
+        for i in range(4):
+            hand_cards = cards[i*1:(i+1)*1]
+            hand_cards.sort(key=cmp_to_key(Card.cmp))
+            # if (0, 7) in hand_cards:
+            #     start_player = i
+            start_player = 0
+            for card_tuple in hand_cards:
+                Card(*card_tuple, self.hand[i])
+        
+        # 状态
+        self.focused_card: Card = None
+        self.playable_cards: list[tuple] = [(0, 7)]   # 开局只能出黑桃7
+        self.start_player = start_player
+        self.current_player = start_player
+        self.can_play_card = False   # 根据规则，当前玩家是否能出牌
         self.end_turn = False
     
     def run_game(self):
@@ -108,16 +147,25 @@ class DaTongSolitaire(Singleton):
                     if self.game_stage == GameStage.start_menu:
                         # 检测是否点击了按钮
                         mouse_pos = pygame.mouse.get_pos()
-                        if self.play_button.rect.collidepoint(mouse_pos):
-                            self.game_stage = GameStage.playing
-                        elif self.exit_button.rect.collidepoint(mouse_pos):
+                        if self.start_menu.play_button.rect.collidepoint(mouse_pos):
+                            self.new_game()
+                        elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
                             sys.exit()
                     elif self.game_stage == GameStage.playing:
                         if self.focused_card:
                             self._on_focused_card_clicked()
                     elif self.game_stage == GameStage.game_over_menu:
                         # TODO
-                        pass
+                        mouse_pos = pygame.mouse.get_pos()
+                        if self.game_over_menu.rect.collidepoint(mouse_pos):
+                            mouse_pos = (
+                                    mouse_pos[0] - self.game_over_menu.rect.left,
+                                    mouse_pos[1] - self.game_over_menu.rect.top
+                                )
+                            if self.game_over_menu.replay_button.rect.collidepoint(mouse_pos):
+                                self.new_game()
+                            elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
+                                sys.exit()
 
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
@@ -220,8 +268,7 @@ class DaTongSolitaire(Singleton):
         """更新屏幕上的图像，并切换到新屏幕"""
         self.screen.fill(self.settings.bg_color)
         if self.game_stage == GameStage.start_menu:
-            self.play_button.blitme()
-            self.exit_button.blitme()
+            self.start_menu.blitme()
         elif self.game_stage == GameStage.playing:
             self.board.blitme()
             self._draw_cards()
