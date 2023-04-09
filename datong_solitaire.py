@@ -12,7 +12,7 @@ from board import Board
 from game_stage import GameStage
 from start_menu import StartMenu
 from game_over_menu import GameOverMenu
-from ai_agent import AiAgent, AiAgentRandom
+from ai_agent import AiAgent, AiAgentRandom, AiAgentNormal
 from utils import darken
 
 class DaTongSolitaire(Singleton):
@@ -40,7 +40,8 @@ class DaTongSolitaire(Singleton):
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_7: list[list[Card]] = [[], [], [], []]
-        self.ai_player:list[AiAgent] = [AiAgentRandom(0), AiAgentRandom(1), AiAgentRandom(2), AiAgentRandom(3)]
+        # self.ai_player:list[AiAgent] = [AiAgentRandom(0), AiAgentRandom(1), AiAgentRandom(2), AiAgentRandom(3)]
+        self.ai_player:list[AiAgent] = [AiAgentNormal(0), AiAgentNormal(1), AiAgentNormal(2), AiAgentNormal(3)]
         
         # 生成卡牌，洗牌并发牌
         cards = []
@@ -456,20 +457,6 @@ class DaTongSolitaire(Singleton):
         # 显示手牌
         for hand in self.hand:
             for card in hand:
-                # if card.info in self.playable_cards and card in self.hand[self.current_player]:
-                #     card.playable = True
-                # if card.info in self.playable_cards and card in self.hand[self.current_player]:
-                #     frame_rect = card.rect.inflate(
-                #             self.settings.card.playable_frame.width,
-                #             self.settings.card.playable_frame.width
-                #         )
-                #     pygame.draw.rect(
-                #             self.screen,
-                #             self.settings.card.playable_frame.color,
-                #             frame_rect,
-                #             width=self.settings.card.playable_frame.width,
-                #             border_radius=self.settings.card.playable_frame.border_radius
-                #         )
                 card.blitme()
         
         # 显示弃牌堆
