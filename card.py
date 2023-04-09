@@ -21,10 +21,6 @@ class Card(Sprite):
         # 原始图像太大了，需要适当缩小
         self.card_image = Card._scale_card_image_and_convert(self.card_image, self.settings.card.load_card_scale)
         self.image = self.card_image
-        # self.size = self.image.get_size()
-        # self.size = (self.size[0] * self.settings.card.load_card_scale, self.size[1] * self.settings.card.load_card_scale)
-        # self.image = pygame.transform.scale(self.image, self.size)
-        # self.image = self.image.convert()
         # 获取图像对应的矩形
         self.rect = self.image.get_rect()
         self.info = (suit, rank)
@@ -82,7 +78,7 @@ class Card(Sprite):
     def blitme(self):
         """在指定位置绘制卡牌"""
         # TODO 正式版需要修改为其他玩家的可打出牌不发红光
-        if self.playable and self.owner == self.game.current_player:
+        if self.playable and self.owner == self.game.current_player and self.game.current_player == 0:
             frame_rect = self.rect.inflate(
                 self.settings.card.playable_frame.width,
                 self.settings.card.playable_frame.width
