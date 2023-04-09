@@ -12,6 +12,7 @@ from board import Board
 from game_stage import GameStage
 from start_menu import StartMenu
 from game_over_menu import GameOverMenu
+from ai_agent import AiAgent, AiAgentRandom
 from utils import darken
 
 class DaTongSolitaire(Singleton):
@@ -28,6 +29,7 @@ class DaTongSolitaire(Singleton):
         self.score:list[int] = [0, 0, 0, 0]
         self.start_menu = StartMenu(self)
         Card._load_card_back_image()
+        self.ai_act_event = pygame.event.custom_type()
     
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
@@ -38,6 +40,7 @@ class DaTongSolitaire(Singleton):
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_7: list[list[Card]] = [[], [], [], []]
+        self.ai_player:list[AiAgent] = [AiAgentRandom(0), AiAgentRandom(1), AiAgentRandom(2), AiAgentRandom(3)]
         
         # 生成卡牌，洗牌并发牌
         cards = []
@@ -65,6 +68,10 @@ class DaTongSolitaire(Singleton):
         self.current_player = start_player
         self.can_play_card = True   # 根据规则，当前玩家是否能出牌
         self.end_turn = False
+        
+        # 如果黑桃7在电脑玩家手中，则设置计时器
+        if self.current_player != 0:
+            pygame.time.set_timer(self.ai_act_event, self.settings.ai_act_interval, 4 - self.current_player)
         
     def new_test_game(self):
         """重置游戏的所有状态，以开始一场新的测试游戏"""
@@ -174,9 +181,9 @@ class DaTongSolitaire(Singleton):
                         elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
                             sys.exit()
                     elif self.game_stage == GameStage.playing:
-                        # TODO
-                        if self.focused_card:
-                            self._on_focused_card_clicked()
+                        if self.current_player == 0:
+                            if self.focused_card:
+                                self._on_focused_card_clicked()
                     elif self.game_stage == GameStage.testing:
                         if self.focused_card:
                             self._on_focused_card_clicked()
@@ -192,6 +199,13 @@ class DaTongSolitaire(Singleton):
                                 self.new_game()
                             elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
                                 sys.exit()
+            elif event.type == self.ai_act_event:
+                if self.can_play_card:
+                    card = self.ai_player[self.current_player].get_card_to_play()
+                    self._play_card(card)
+                else:
+                    card = self.ai_player[self.current_player].get_card_to_discard()
+                    self._discard_card(card)
 
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
@@ -201,6 +215,10 @@ class DaTongSolitaire(Singleton):
         if not any(self.hand):
             self._end_game()
             return
+
+        # 玩家打出牌后开始计时，每过一秒电脑行动一次
+        if self.current_player == 0:
+            pygame.time.set_timer(self.ai_act_event, self.settings.ai_act_interval, loops=3)
         
         # 更新当前玩家 和 当前玩家是否可出牌的状态
         self.current_player = (self.current_player + 1) % 4
@@ -212,6 +230,9 @@ class DaTongSolitaire(Singleton):
     
     def _end_game(self):
         """游戏结束时的结算"""
+        # 如果还在计时，则停止计时
+        pygame.time.set_timer(self.ai_act_event, 0)
+        
         score_multiply_power = 1
         # 弃牌点数加总
         points = [0, 0, 0, 0]

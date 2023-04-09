@@ -16,6 +16,8 @@ class Settings(Singleton):
             self.game = game
         else:
             raise Exception("No game provided when initializing Settings class!")
+        
+        self.ai_act_interval = 1000
         screen_rect = pygame.display.get_surface().get_rect()
         self.screen_width = screen_rect.width
         self.screen_height = screen_rect.height
