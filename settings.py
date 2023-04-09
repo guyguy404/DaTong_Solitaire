@@ -18,9 +18,12 @@ class Settings(Singleton):
             raise Exception("No game provided when initializing Settings class!")
         
         self.ai_act_interval = 1000
+        self.dft_scr_w = 1707
+        self.dft_scr_h = 1067
         screen_rect = pygame.display.get_surface().get_rect()
         self.screen_width = screen_rect.width
         self.screen_height = screen_rect.height
+        self.scale_ratio = (self.screen_width / self.dft_scr_w + self.screen_height / self.dft_scr_h) / 2
         self.bg_color = Settings.Color.olivedrab
         self.font_name = '霞鹜文楷'
         self.font_path = 'fonts/LXGWWenKai-Regular.ttf'
@@ -56,11 +59,12 @@ class Settings(Singleton):
         class Button:
             """开始界面中所有按钮设置信息的基类"""
             def __init__(self):
-                self.width = 200
-                self.height = 100
+                self.settings = Settings()
+                self.width = 200 * self.settings.scale_ratio
+                self.height = 100 * self.settings.scale_ratio
                 self.color = Settings.Color.white
                 self.text_color = Settings.Color.black
-                self.font_size = 32
+                self.font_size = int(32 * self.settings.scale_ratio)
             
         class PlayButton(Button):
             """开始界面中的“开始游戏”按钮设置类"""
@@ -89,9 +93,10 @@ class Settings(Singleton):
     class Card:
         """卡牌相关的设置类"""
         def __init__(self):
+            self.settings = Settings()
             self.raw_width = 500
             self.raw_height = 726
-            self.load_card_scale = 0.3
+            self.load_card_scale = 0.3 * self.settings.scale_ratio
             self.width = self.load_card_scale * self.raw_width
             self.height = self.load_card_scale * self.raw_height
             self.hand_xspacing = 0.5 * self.width
@@ -117,26 +122,29 @@ class Settings(Singleton):
     class Board:
         """信息面板相关的设置类"""
         def __init__(self):
-            self.width = 200
-            self.height = 250
-            self.left_margin = 90
-            self.top_margin = 20
+            self.settings = Settings()
+            self.width = 200 * self.settings.scale_ratio
+            self.height = 250 * self.settings.scale_ratio
+            self.left_margin = 90 * self.settings.scale_ratio
+            self.top_margin = 20 * self.settings.scale_ratio
             self.color = Settings.Color.burlywood
-            self.font_size = 20
+            self.font_size = int(20 * self.settings.scale_ratio)
             self.text = Settings.Board.Text()
         
         class Text:
             
             def __init__(self):
-                self.left_margin = 20
-                self.top_margin = 20
-                self.line_spacing = 10
+                self.settings = Settings()
+                self.left_margin = 20 * self.settings.scale_ratio
+                self.top_margin = 20 * self.settings.scale_ratio
+                self.line_spacing = 10 * self.settings.scale_ratio
 
     class GameOverMenu:
         """游戏结束菜单设置类"""
         def __init__(self):
-            self.width = 1200
-            self.height = 800
+            self.settings = Settings()
+            self.width = 1200 * self.settings.scale_ratio
+            self.height = 800 * self.settings.scale_ratio
             self.color = Settings.Color.burlywood
             self.title = Settings.GameOverMenu.Title()
             self.content = Settings.GameOverMenu.Content()
@@ -146,26 +154,29 @@ class Settings(Singleton):
         class Title:
             
             def __init__(self):
-                self.font_size = 52
+                self.settings = Settings()
+                self.font_size = int(52 * self.settings.scale_ratio)
                 self.color = Settings.Color.black
-                self.top_margin = 50
+                self.top_margin = 50 * self.settings.scale_ratio
         
         class Content:
             
             def __init__(self):
-                self.font_size = 40
+                self.settings = Settings()
+                self.font_size = int(40 * self.settings.scale_ratio)
                 self.color = Settings.Color.black
-                self.top_margin = 160
-                self.line_spacing = 20
+                self.top_margin = 160 * self.settings.scale_ratio
+                self.line_spacing = 20 * self.settings.scale_ratio
         
         class Button:
             """游戏结束界面中所有按钮设置信息的基类"""
             def __init__(self):
-                self.width = 200
-                self.height = 100
+                self.settings = Settings()
+                self.width = 200 * self.settings.scale_ratio
+                self.height = 100 * self.settings.scale_ratio
                 self.color = Settings.Color.white
                 self.text_color = Settings.Color.black
-                self.font_size = 32
+                self.font_size = int(32 * self.settings.scale_ratio)
                 
         class ReplayButton(Button):
             """游戏结束界面中“再来一局”按钮的设置类"""
