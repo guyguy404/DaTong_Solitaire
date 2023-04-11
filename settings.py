@@ -1,12 +1,17 @@
+from __future__ import annotations
 import pygame
 from singleton import Singleton
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datong_solitaire import DaTongSolitaire
 
 class Settings(Singleton):
     """存储游戏中所有设置的类"""
     
     has_inited = False
     
-    def __init__(self, game=None):
+    def __init__(self, game: DaTongSolitaire=None):
         """设置类的初始化（需要在游戏开始获取屏幕大小后才能初始化）"""
         if Settings.has_inited:
             return
