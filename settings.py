@@ -3,6 +3,9 @@ import pygame
 from singleton import Singleton
 from typing import TYPE_CHECKING
 
+# 关于如何解决 Python type hints 导致的 circular imports 的问题，详见下述链接
+# https://adamj.eu/tech/2021/05/13/python-type-hints-how-to-fix-circular-imports/
+
 if TYPE_CHECKING:
     from datong_solitaire import DaTongSolitaire
 
@@ -13,16 +16,23 @@ class Settings(Singleton):
     
     def __init__(self, game: DaTongSolitaire=None):
         """设置类的初始化（需要在游戏开始获取屏幕大小后才能初始化）"""
+        # Settings 作为单例类，只初始化一次
         if Settings.has_inited:
             return
         Settings.has_inited = True
         
+        # 初始化时应当提供游戏类的实例，以便后续其他的对象通过Settings类来获取游戏类的实例
+        # 这样做的主要原因是
+        # 游戏主体模块导入了几乎所有的其他自定义模块，这就导致其他自定义模块导入游戏主体模块时必然导致 circular imports
+        # 而Settings类则几乎没有导入其他自定义模块，可以被其他自定义模块导入并获取其全局单例
+        # 另一种解决方法是在构造游戏中对象实例时传入游戏主体的实例，但那样有些麻烦，不甚优雅
         if game:
             self.game = game
         else:
             raise Exception("No game provided when initializing Settings class!")
         
         self.ai_act_interval = 1000
+        # default_screen_width, default_screen_height
         self.dft_scr_w = 1707
         self.dft_scr_h = 1067
         screen_rect = pygame.display.get_surface().get_rect()
@@ -44,7 +54,7 @@ class Settings(Singleton):
         white = (255, 255, 255)
         red = (255, 0, 0)
         olivedrab = (107, 142, 35)
-        burlywood = (222, 184, 135)    # (205, 170, 125)
+        burlywood = (222, 184, 135)
     
     class StartMenu:
         """开始界面的设置类"""
@@ -110,6 +120,7 @@ class Settings(Singleton):
             self.playable_frame = Settings.Card.PlayableFrame()
         
         class PlayableFrame:
+            """可打出卡牌的提示框相关的设置类"""
             def __init__(self):
                 self.color = Settings.Color.red
                 self.width = 15
@@ -137,12 +148,13 @@ class Settings(Singleton):
             self.text = Settings.Board.Text()
         
         class Text:
-            
+            """信息面板上文字相关的设置"""
             def __init__(self):
                 self.settings = Settings()
                 self.left_margin = 20 * self.settings.scale_ratio
                 self.top_margin = 20 * self.settings.scale_ratio
                 self.line_spacing = 10 * self.settings.scale_ratio
+                self.color = Settings.Color.black
 
     class GameOverMenu:
         """游戏结束菜单设置类"""
@@ -157,7 +169,7 @@ class Settings(Singleton):
             self.exit_button = Settings.GameOverMenu.ExitButton(self.width, self.height)
         
         class Title:
-            
+            """游戏结束界面中标题的设置类"""
             def __init__(self):
                 self.settings = Settings()
                 self.font_size = int(52 * self.settings.scale_ratio)
@@ -165,7 +177,7 @@ class Settings(Singleton):
                 self.top_margin = 50 * self.settings.scale_ratio
         
         class Content:
-            
+            """游戏结束界面中内容文字的设置类"""
             def __init__(self):
                 self.settings = Settings()
                 self.font_size = int(40 * self.settings.scale_ratio)
