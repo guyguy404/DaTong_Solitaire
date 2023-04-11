@@ -44,10 +44,7 @@ class DaTongSolitaire(Singleton):
         self.ai_player:list[AiAgent] = [AiAgentNormal(0), AiAgentNormal(1), AiAgentNormal(2), AiAgentNormal(3)]
         
         # 生成卡牌，洗牌并发牌
-        cards = []
-        for i in range(4):
-            for j in range(1, 13+1):
-                cards.append((i, j))
+        cards = [(i, j) for i in range(4) for j in range(1, 13+1)]
         shuffle(cards)
         for i in range(4):
             hand_cards = cards[i*13:(i+1)*13]
