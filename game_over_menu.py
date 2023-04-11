@@ -53,7 +53,8 @@ class GameOverMenu(Sprite):
             y=self.settings.game_over_menu.replay_button.centery,
             button_color=self.settings.game_over_menu.replay_button.color,
             text_color=self.settings.game_over_menu.replay_button.text_color,
-            font_size=self.settings.game_over_menu.replay_button.font_size
+            font_size=self.settings.game_over_menu.replay_button.font_size,
+            parent_obj=self
         )
         self.exit_button = Button(
             msg=self.settings.game_over_menu.exit_button.msg,
@@ -63,7 +64,8 @@ class GameOverMenu(Sprite):
             y=self.settings.game_over_menu.exit_button.centery,
             button_color=self.settings.game_over_menu.exit_button.color,
             text_color=self.settings.game_over_menu.exit_button.text_color,
-            font_size=self.settings.game_over_menu.exit_button.font_size
+            font_size=self.settings.game_over_menu.exit_button.font_size,
+            parent_obj=self
         )
     
     def update(self):

@@ -27,6 +27,7 @@ class DaTongSolitaire(Singleton):
         pygame.display.set_caption("大通纸牌")
         self.game_stage = GameStage.start_menu
         self.score:list[int] = [0, 0, 0, 0]
+        self.buttons = Group()
         self.start_menu = StartMenu(self)
         Card._load_card_back_image()
         self.ai_act_event = pygame.event.custom_type()
@@ -41,7 +42,7 @@ class DaTongSolitaire(Singleton):
         self.played_cards_greater_7: list[list[Card]] = [[], [], [], []]
         self.played_cards_7: list[list[Card]] = [[], [], [], []]
         # self.ai_player:list[AiAgent] = [AiAgentRandom(0), AiAgentRandom(1), AiAgentRandom(2), AiAgentRandom(3)]
-        self.ai_player:list[AiAgent] = [AiAgentNormal(0), AiAgentNormal(1), AiAgentNormal(2), AiAgentNormal(3)]
+        self.ai_player: list[AiAgent] = [AiAgentNormal(0), AiAgentNormal(1), AiAgentNormal(2), AiAgentNormal(3)]
         
         # 生成卡牌，洗牌并发牌
         cards = [(i, j) for i in range(4) for j in range(1, 13+1)]
@@ -144,6 +145,7 @@ class DaTongSolitaire(Singleton):
 
     def _update_objects(self):
         """更新游戏中的物体属性等"""
+        self.buttons.update()
         if self.game_stage == GameStage.start_menu:
             pass
         elif self.game_stage == GameStage.playing:
