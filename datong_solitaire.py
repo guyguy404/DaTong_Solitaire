@@ -177,7 +177,8 @@ class DaTongSolitaire(Singleton):
                         if self.start_menu.play_button.rect.collidepoint(mouse_pos):
                             self.new_game()
                         elif self.start_menu.test_button.rect.collidepoint(mouse_pos):
-                            self.new_test_game()
+                            # self.new_test_game()
+                            pass
                         elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
                             sys.exit()
                     elif self.game_stage == GameStage.playing:
