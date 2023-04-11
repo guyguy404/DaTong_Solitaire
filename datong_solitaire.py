@@ -349,11 +349,6 @@ class DaTongSolitaire(Singleton):
             card.rect.left = left_margin + i * self.settings.card.hand_xspacing
             card.rect.bottom = self.settings.screen_height + 0.6 * self.settings.card.height
         
-        # left_margin += len(self.hand[0]) * self.settings.card.hand_xspacing
-        # for i, card in enumerate(self.trashed_cards[0]):
-        #     card.rect.left = left_margin + i * self.settings.card.hand_xspacing
-        #     card.rect.bottom = self.settings.screen_height + 0.6 * self.settings.card.height
-        
         # 设置右侧玩家手牌位置
         top_margin = (self.settings.screen_height
                        - (len(self.hand[1])+len(self.trashed_cards[1])-1) * self.settings.card.hand_yspacing
@@ -361,11 +356,6 @@ class DaTongSolitaire(Singleton):
         for i, card in enumerate(self.hand[1].sprites() + self.trashed_cards[1].sprites()):
             card.rect.top = top_margin + i * self.settings.card.hand_yspacing
             card.rect.right = self.settings.screen_width + 0.6 * self.settings.card.width
-        
-        # top_margin += len(self.hand[1]) * self.settings.card.hand_yspacing
-        # for i, card in enumerate(self.trashed_cards[1]):
-        #     card.rect.top = top_margin + i * self.settings.card.hand_yspacing
-        #     card.rect.right = self.settings.screen_width + 0.6 * self.settings.card.width
         
         # 设置对侧玩家的手牌位置
         right_margin = (self.settings.screen_width
@@ -375,11 +365,6 @@ class DaTongSolitaire(Singleton):
             card.rect.right = self.settings.screen_width - (right_margin + i * self.settings.card.hand_xspacing)
             card.rect.top = 0 - 0.6 * self.settings.card.height
         
-        # right_margin += len(self.hand[2]) * self.settings.card.hand_xspacing
-        # for i, card in enumerate(self.trashed_cards[2]):
-        #     card.rect.right = self.settings.screen_width - (right_margin + i * self.settings.card.hand_xspacing)
-        #     card.rect.top = 0 - 0.6 * self.settings.card.height
-        
         # 设置左侧玩家手牌位置
         top_margin = (self.settings.screen_height
                        - (len(self.hand[3])+len(self.trashed_cards[3])-1) * self.settings.card.hand_yspacing
@@ -388,11 +373,6 @@ class DaTongSolitaire(Singleton):
             card.rect.top = top_margin + i * self.settings.card.hand_yspacing
             card.rect.left = 0 - 0.6 * self.settings.card.width
         
-        # top_margin += len(self.hand[3]) * self.settings.card.hand_yspacing
-        # for i, card in enumerate(self.trashed_cards[3]):
-        #     card.rect.top = top_margin + i * self.settings.card.hand_yspacing
-        #     card.rect.left = 0 - 0.6 * self.settings.card.width
-            
         # 设置场上卡牌位置
         for i in range(4):
             for j, card in enumerate(reversed(self.played_cards_greater_7[i])):
@@ -432,12 +412,6 @@ class DaTongSolitaire(Singleton):
                 else:
                     card.focused = False
                 
-                # # 检测卡牌是否可打出
-                # if card.info in self.playable_cards and card in self.hand[self.current_player]:
-                #     card.playable = True
-                # else:
-                #     card.playable = False
-        
     def _draw_cards(self):
         """在屏幕上绘制所有卡牌"""
         # 显示场上卡牌
