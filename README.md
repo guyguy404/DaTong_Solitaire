@@ -14,4 +14,22 @@
 
 ## 游玩指南
 
+### 下载方式1：
+
 在本GitHub页面中单击绿色的“Code”键，选择下拉菜单中最下面的“Download ZIP”键下载压缩包，解压后双击“大通纸牌.exe”运行。
+
+![游玩指南-截图1](D:\Codefield\PythonCode\DaTong_Solitaire\images\readme\游玩指南-截图1.png)
+
+![游玩指南-截图2](D:\Codefield\PythonCode\DaTong_Solitaire\images\readme\游玩指南-截图2.png)
+
+
+
+### 下载方式2：
+
+https://pan.baidu.com/s/1U8sVzz95v1DsK0woQ5WG2A?pwd=7lg6
+
+
+
+### 注意！
+
+注意要解压整个文件夹，不要只解压exe文件。exe文件的运行需要fonts和images文件夹的支持
