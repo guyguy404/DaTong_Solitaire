@@ -33,3 +33,5 @@ https://pan.baidu.com/s/1U8sVzz95v1DsK0woQ5WG2A?pwd=7lg6
 ### 注意！
 
 注意要解压整个文件夹，不要只解压exe文件。exe文件的运行需要fonts和images文件夹的支持
+
+目前此游戏不支持mac、win7及更低版本，非常抱歉
