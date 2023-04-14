@@ -62,7 +62,7 @@ class Settings(Singleton):
         def __init__(self, surf_width, surf_height):
             self.title = Settings.StartMenu.Title(surf_width, surf_height)
             self.play_button = Settings.StartMenu.PlayButton(surf_width, surf_height)
-            self.test_button = Settings.StartMenu.TestButton(surf_width, surf_height)
+            self.rule_button = Settings.StartMenu.RuleButton(surf_width, surf_height)
             self.exit_button = Settings.StartMenu.ExitButton(surf_width, surf_height)
         
         class Title:
@@ -89,11 +89,19 @@ class Settings(Singleton):
                 self.centerx = surf_width // 2
                 self.centery = surf_height // 2
             
-        class TestButton(Button):
-            """开始界面中的“测试游戏”按钮设置类"""
+        # class TestButton(Button):
+        #     """开始界面中的“测试游戏”按钮设置类"""
+        #     def __init__(self, surf_width, surf_height):
+        #         super().__init__()
+        #         self.msg = "测试游戏"
+        #         self.centerx = surf_width // 2
+        #         self.centery = surf_height // 2 + Settings.StartMenu.button_yspacing
+        
+        class RuleButton(Button):
+            """开始界面中的“游戏规则”按钮设置类"""
             def __init__(self, surf_width, surf_height):
                 super().__init__()
-                self.msg = "测试游戏"
+                self.msg = "游戏规则"
                 self.centerx = surf_width // 2
                 self.centery = surf_height // 2 + Settings.StartMenu.button_yspacing
         

@@ -176,9 +176,8 @@ class DaTongSolitaire(Singleton):
                         mouse_pos = pygame.mouse.get_pos()
                         if self.start_menu.play_button.rect.collidepoint(mouse_pos):
                             self.new_game()
-                        elif self.start_menu.test_button.rect.collidepoint(mouse_pos):
-                            # self.new_test_game()
-                            pass
+                        elif self.start_menu.rule_button.rect.collidepoint(mouse_pos):
+                            self.open_rule()
                         elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
                             sys.exit()
                     elif self.game_stage == GameStage.playing:
@@ -208,6 +207,11 @@ class DaTongSolitaire(Singleton):
                     card = self.ai_player[self.current_player].get_card_to_discard()
                     self._discard_card(card)
 
+    def open_rule(self):
+        """打开游戏规则界面"""
+        # self.game_stage = GameStage.rule
+        # TODO
+    
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
         self.end_turn = False

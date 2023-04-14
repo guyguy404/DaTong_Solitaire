@@ -6,3 +6,4 @@ class GameStage(Enum):
     playing = 1
     testing = 2
     game_over_menu = 3
+    rule = 4
