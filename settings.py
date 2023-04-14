@@ -48,6 +48,8 @@ class Settings(Singleton):
         self.field = Settings.Field()
         self.board = Settings.Board()
         self.game_over_menu = Settings.GameOverMenu()
+        self.window = Settings.Window()
+        self.rule_window = Settings.RuleWindow()
     
     class Color:
         black = (0, 0, 0)
@@ -55,6 +57,41 @@ class Settings(Singleton):
         red = (255, 0, 0)
         olivedrab = (107, 142, 35)
         burlywood = (222, 184, 135)
+    
+    class Window:
+        """与游戏中所有窗口有关的设置类"""
+        def __init__(self):
+            self.color = Settings.Color.burlywood
+    
+    class RuleWindow:
+        """规则窗口的设置类"""
+        def __init__(self):
+            self.settings = Settings()
+            self.width = 1200 * self.settings.scale_ratio
+            self.height = 800 * self.settings.scale_ratio
+            self.text_color = Settings.Color.black
+            self.font_size = int(28 * self.settings.scale_ratio)
+            self.text = """
+            《大通纸牌》是一款四人纸牌接龙游戏，
+            你的目标是打出尽量多的牌，并使无法打出的牌点数总和尽量小。
+            游戏使用一副去掉大小王的扑克牌进行。
+            发牌后从持有黑桃7的玩家开始出牌。
+            第一张牌只能出黑桃7。
+            之后四名玩家轮流出牌接龙，
+            每种花色向场上打出的第一张牌只能是点数为7的那张牌，
+            之后则是打出与其点数相邻的牌进行接龙。
+            当一名玩家无牌可出时则需要从手中选择一张牌暗扣下，
+            之后不得再打出此牌。
+            当所有玩家都打光手牌后，每位玩家计算其所有暗扣下的牌的点数总和，
+            数值按从小到大排序，如果数值相同则先出牌的排在前面，
+            点数最小的是第一名，获得6分，二三四名分别失去1、2、3分。
+            如果第一名的玩家的暗扣牌点数总和为0（即没有任何暗扣牌），
+            则称之为“大通”，
+            这一轮所有玩家的得分和失分翻倍
+            （即第一名获得12分，二三四名分别失去2、4、6分）。
+            """
+            self.top_margin = 50 * self.settings.scale_ratio
+            self.left_margin = 50 * self.settings.scale_ratio
     
     class StartMenu:
         """开始界面的设置类"""

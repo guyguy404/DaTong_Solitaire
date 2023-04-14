@@ -13,6 +13,8 @@ from game_stage import GameStage
 from start_menu import StartMenu
 from game_over_menu import GameOverMenu
 from ai_agent import AiAgent, AiAgentRandom, AiAgentNormal
+from window import Window
+from rule_window import RuleWindow
 from utils import darken
 
 class DaTongSolitaire(Singleton):
@@ -31,6 +33,7 @@ class DaTongSolitaire(Singleton):
         self.start_menu = StartMenu(self)
         Card._load_card_back_image()
         self.ai_act_event = pygame.event.custom_type()
+        self.windows: list[Window] = []
     
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
@@ -180,6 +183,12 @@ class DaTongSolitaire(Singleton):
                             self.open_rule()
                         elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
                             sys.exit()
+                    elif self.game_stage == GameStage.rule:
+                        # TODO
+                        mouse_pos = pygame.mouse.get_pos()
+                        if self.windows[-1].exit_button.rect.collidepoint(mouse_pos):
+                            self.game_stage = GameStage.start_menu
+                            self.windows.pop()
                     elif self.game_stage == GameStage.playing:
                         if self.current_player == 0:
                             if self.focused_card:
@@ -209,8 +218,10 @@ class DaTongSolitaire(Singleton):
 
     def open_rule(self):
         """打开游戏规则界面"""
-        # self.game_stage = GameStage.rule
-        # TODO
+        self.game_stage = GameStage.rule
+        rule_window = RuleWindow()
+        self.windows.append(rule_window)
+        
     
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
@@ -327,6 +338,8 @@ class DaTongSolitaire(Singleton):
         self.screen.fill(self.settings.bg_color)
         if self.game_stage == GameStage.start_menu:
             self.start_menu.blitme()
+        elif self.game_stage == GameStage.rule:
+            pass
         elif self.game_stage == GameStage.playing:
             self.board.blitme()
             self._draw_cards()
@@ -340,7 +353,14 @@ class DaTongSolitaire(Singleton):
             darken(self.screen)
             # 背景变暗后再绘制游戏结束界面
             self.game_over_menu.blitme()
-        
+            
+        # 如果有窗口需要显示
+        if self.windows:
+            for covered in self.windows[:-1]:
+                covered.blitme()
+            darken(self.screen)
+            self.windows[-1].blitme()
+            
         pygame.display.flip()
     
     def _update_cards(self):
