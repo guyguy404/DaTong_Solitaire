@@ -18,6 +18,16 @@ class GameOverMenu(Sprite):
         self.title_font = pygame.font.Font(self.settings.font_path, self.settings.game_over_menu.title.font_size)
         self.content_font = pygame.font.Font(self.settings.font_path, self.settings.game_over_menu.content.font_size)
         self.winner = sorted_player_points_pairs[0][0]
+        if score_multiply_power == 2:
+            self.datong = True
+            self.datong_icon_image = pygame.transform.scale_by(
+                pygame.image.load('images/emphasize_icon.png'),
+                self.settings.game_over_menu.datong_icon.load_scale
+            )
+            self.datong_icon_rect = self.datong_icon_image.get_rect(
+                right=self.rect.width - self.settings.game_over_menu.datong_icon.right_margin,
+                top=self.settings.game_over_menu.datong_icon.top_margin
+            )
         
         self.title_text = self.title_font.render(
             self.settings.player_name[self.winner] + "胜利！",
@@ -78,4 +88,6 @@ class GameOverMenu(Sprite):
             menu.blit(self.content_text[i], self.content_rect[i])
         self.replay_button.blitme(menu)
         self.exit_button.blitme(menu)
+        if self.datong:
+            menu.blit(self.datong_icon_image, self.datong_icon_rect)
         self.screen.blit(menu, self.rect)

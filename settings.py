@@ -213,6 +213,7 @@ class Settings(Singleton):
             self.content = Settings.GameOverMenu.Content()
             self.replay_button = Settings.GameOverMenu.ReplayButton(self.width, self.height)
             self.exit_button = Settings.GameOverMenu.ExitButton(self.width, self.height)
+            self.datong_icon = Settings.GameOverMenu.DaTongIcon()
         
         class Title:
             """游戏结束界面中标题的设置类"""
@@ -222,6 +223,14 @@ class Settings(Singleton):
                 self.color = Settings.Color.black
                 self.top_margin = 50 * self.settings.scale_ratio
         
+        class DaTongIcon:
+            """大通时显示的标志相关的设置类"""
+            def __init__(self):
+                self.settings = Settings()
+                self.load_scale = 1 * self.settings.scale_ratio
+                self.right_margin = 0 * self.settings.scale_ratio
+                self.top_margin = 0 * self.settings.scale_ratio
+                
         class Content:
             """游戏结束界面中内容文字的设置类"""
             def __init__(self):
