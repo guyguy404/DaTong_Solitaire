@@ -7,11 +7,11 @@ from settings import Settings
 class Board(Sprite):
     """管理用于显示信息的面板的类"""
     
-    def __init__(self, game):
+    def __init__(self):
         super().__init__()
         # 暂时采用纯色背景
-        self.game = game
         self.settings = Settings()
+        self.game = self.settings.game
         self.screen = pygame.display.get_surface()
         self.image = Surface((self.settings.board.width, self.settings.board.height))
         self.image.fill(self.settings.board.color)
@@ -46,7 +46,7 @@ class Board(Sprite):
     
     def update(self):
         self.curr_player_text = self.font.render(
-            "当前玩家：" + str(self.game.current_player),
+            "当前玩家：" + self.settings.player_name[self.game.current_player],
             True,
             (10, 10, 10)
         )
@@ -59,7 +59,7 @@ class Board(Sprite):
         self.score_text_rect = []
         for i in range(4):
             self.score_text.append(self.font.render(
-                "玩家" + str(i) + "：" + str(self.game.score[i]),
+                self.settings.player_name[i] + "：" + str(self.game.score[i]),
                 True,
                 (10, 10, 10)
             ))

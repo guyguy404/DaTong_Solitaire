@@ -43,6 +43,7 @@ class Settings(Singleton):
         self.font_name = '霞鹜文楷'
         self.font_path = 'fonts/LXGWWenKai-Regular.ttf'
         self.base_score = [6, -1, -2, -3]
+        self.player_name = ['玩家', '电脑1', '电脑2', '电脑3']
         self.start_menu = Settings.StartMenu(self.screen_width, self.screen_height)
         self.card = Settings.Card()
         self.field = Settings.Field()

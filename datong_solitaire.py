@@ -38,7 +38,7 @@ class DaTongSolitaire(Singleton):
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
         self.game_stage = GameStage.playing
-        self.board = Board(self)
+        self.board = Board()
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
@@ -78,7 +78,7 @@ class DaTongSolitaire(Singleton):
     def new_test_game(self):
         """重置游戏的所有状态，以开始一场新的测试游戏"""
         self.game_stage = GameStage.testing
-        self.board = Board(self)
+        self.board = Board()
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
@@ -110,7 +110,7 @@ class DaTongSolitaire(Singleton):
     # def new_test_game_one_card_per_player(self):
     #     """重置游戏的所有状态，以开始一场新的测试游戏，测试游戏中每名玩家只有一张牌，以便快速测试游戏结束的场景"""
     #     self.game_stage = GameStage.testing
-    #     self.board = Board(self)
+    #     self.board = Board()
     #     self.hand: list[Group] = [Group(), Group(), Group(), Group()]
     #     self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
     #     self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
