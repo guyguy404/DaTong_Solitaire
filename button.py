@@ -27,8 +27,7 @@ class Button(Sprite):
         self.screen_rect = self.screen.get_rect()
         self.image = Surface((width, height))
         self.image.fill(button_color)
-        if parent_obj:
-            self.parent_obj = parent_obj
+        self.parent_obj = parent_obj
         
         # 设置按钮的尺寸和其他属性
         self.width = width
@@ -48,7 +47,7 @@ class Button(Sprite):
         
         self.abs_rect = self.rect.copy()
         curr_obj = self
-        while hasattr(curr_obj, 'parent_obj'):
+        while hasattr(curr_obj, 'parent_obj') and not curr_obj.parent_obj is None:
             self.abs_rect.x += curr_obj.parent_obj.rect.x
             self.abs_rect.y += curr_obj.parent_obj.rect.y
             curr_obj = curr_obj.parent_obj
@@ -72,8 +71,9 @@ class Button(Sprite):
         surface.blit(button, self.rect)
     
     def update(self) -> None:
-        mouse_pos = pygame.mouse.get_pos()
-        if self.abs_rect.collidepoint(mouse_pos):
-            self.focused = True
-        else:
-            self.focused = False
+        if (self.parent_obj is None and not self.game.windows) or (not self.parent_obj is None and self.game.windows and self.game.windows[-1] == self.parent_obj):
+            mouse_pos = pygame.mouse.get_pos()
+            if self.abs_rect.collidepoint(mouse_pos):
+                self.focused = True
+            else:
+                self.focused = False
