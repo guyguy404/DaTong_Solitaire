@@ -11,6 +11,9 @@ class GameOverMenu(Sprite):
         self.game = game
         self.settings = Settings()
         self.screen = pygame.display.get_surface()
+        self.win_sound = pygame.mixer.Sound('music/音效/instant-win.wav')
+        self.datong_sound = pygame.mixer.Sound('music/音效/huge-win.mp3')
+        self.lose_sound = pygame.mixer.Sound('music/音效/horror-lose.wav')
         self.image = Surface((self.settings.game_over_menu.width, self.settings.game_over_menu.height))
         self.image.fill(self.settings.game_over_menu.color)
         self.rect = self.image.get_rect()
@@ -18,6 +21,7 @@ class GameOverMenu(Sprite):
         self.title_font = pygame.font.Font(self.settings.font_path, self.settings.game_over_menu.title.font_size)
         self.content_font = pygame.font.Font(self.settings.font_path, self.settings.game_over_menu.content.font_size)
         self.winner = sorted_player_points_pairs[0][0]
+        self.datong = False
         if score_multiply_power == 2:
             self.datong = True
             self.datong_icon_image = pygame.transform.scale_by(

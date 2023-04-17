@@ -16,8 +16,9 @@ class Card(Sprite):
         self.settings = Settings()
         self.game = self.settings.game
         self.screen = pygame.display.get_surface()
+        self.sound = pygame.mixer.Sound('music/cards/' + self._card_sound_filename(suit, rank))
         # 加载卡牌图像
-        self.card_image = pygame.image.load('images/cards/' + self._card_filename(suit, rank))
+        self.card_image = pygame.image.load('images/cards/' + self._card_image_filename(suit, rank))
         # 原始图像太大了，需要适当缩小
         self.card_image = Card._scale_card_image_and_convert(self.card_image, self.settings.card.load_card_scale)
         self.image = self.card_image
@@ -99,8 +100,23 @@ class Card(Sprite):
                 self.screen.blit(Card.back_image, self.rect)
         
         
+    def _card_sound_filename(self, suit, rank) -> str:
+        """根据参数生成对应的卡牌音频名称"""
+        suits = ['黑桃', '梅花', '红桃', '方块']
+        rank_str = ''
+        if rank <= 10:
+            rank_str = str(rank)
+        elif rank == 11:
+            rank_str = 'J'
+        elif rank == 12:
+            rank_str = 'Q'
+        elif rank == 13:
+            rank_str = 'K'
+            
+        filename = suits[suit] + rank_str + '.mp3'
+        return filename
     
-    def _card_filename(self, suit, rank) -> str:
+    def _card_image_filename(self, suit, rank) -> str:
         """根据参数生成对应的卡牌图像名称"""
         rank_str = ''
         if type(suit) == int:

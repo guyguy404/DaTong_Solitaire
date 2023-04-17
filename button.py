@@ -71,7 +71,7 @@ class Button(Sprite):
         surface.blit(button, self.rect)
     
     def update(self) -> None:
-        if (self.parent_obj is None and not self.game.windows) or (not self.parent_obj is None and self.game.windows and self.game.windows[-1] == self.parent_obj):
+        if (not self.game.windows) or (not self.parent_obj is None and self.game.windows and self.game.windows[-1] == self.parent_obj):
             mouse_pos = pygame.mouse.get_pos()
             if self.abs_rect.collidepoint(mouse_pos):
                 self.focused = True

@@ -3,7 +3,8 @@ import pygame
 import numpy
 from pygame.sprite import Sprite, Group
 from pygame.event import Event
-from random import shuffle
+from pygame.mixer import Sound
+from random import shuffle, choice
 from functools import cmp_to_key
 
 from singleton import Singleton
@@ -36,9 +37,14 @@ class DaTongSolitaire(Singleton):
         Card._load_card_back_image()
         self.ai_act_event = pygame.event.custom_type()
         self.windows: list[Window] = []
+        pygame.mixer.init()
+        self.start_menu_music = Sound(choice(self.settings.start_menu_music))
+        self.start_menu_music.play()
+        self.discard_sound = Sound('music/音效/要不起.mp3')
     
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
+        pygame.mixer.fadeout(1000)
         self.game_stage = GameStage.playing
         self.board = Board()
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
@@ -193,7 +199,7 @@ class DaTongSolitaire(Singleton):
         # 如果左键点击
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
             mouse_pos = pygame.mouse.get_pos()
-            if window.exit_button.rect.collidepoint(mouse_pos):
+            if window.exit_button.abs_rect.collidepoint(mouse_pos):
                 self.game_stage = GameStage.start_menu
                 self.windows.pop()
     
@@ -215,7 +221,6 @@ class DaTongSolitaire(Singleton):
         """无弹出窗口时的事件检查"""
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                # TODO
                 self.exit_confirm()
                 return
         if self.game_stage == GameStage.start_menu:
@@ -224,6 +229,8 @@ class DaTongSolitaire(Singleton):
             self._check_events_in_game(event)
         elif self.game_stage == GameStage.testing:
             self._check_events_in_testing_game(event)
+        elif self.game_stage == GameStage.game_over_menu:
+            self._check_events_in_game_over_menu(event)
         else:
             # TODO
             pass
@@ -319,7 +326,7 @@ class DaTongSolitaire(Singleton):
                 if self.game_over_menu.replay_button.rect.collidepoint(mouse_pos):
                     self.new_game()
                 elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
-                    sys.exit()
+                    self.exit_confirm()
 
     def open_rule(self):
         """打开游戏规则界面"""
@@ -377,6 +384,14 @@ class DaTongSolitaire(Singleton):
         
         self.game_stage = GameStage.game_over_menu
         self.game_over_menu = GameOverMenu(self, sorted_player_points_pairs, score_multiply_power)
+        
+        if sorted_player_points_pairs[0][0] == 0:
+            if score_multiply_power == 1:
+                self.game_over_menu.win_sound.play()
+            elif score_multiply_power == 2:
+                self.game_over_menu.datong_sound.play()
+        else:
+            self.game_over_menu.lose_sound.play()
     
     def _on_focused_card_clicked(self):
         """当聚焦的卡牌被点击时"""
@@ -394,6 +409,7 @@ class DaTongSolitaire(Singleton):
     
     def _play_card(self, card: Card):
         """当前玩家打出指定的卡牌"""
+        card.sound.play()
         card.to_visible()
         # 将此牌从手中移动到场上
         if card.rank < 7:
@@ -433,6 +449,7 @@ class DaTongSolitaire(Singleton):
     
     def _discard_card(self, card: Card):
         """当前玩家弃置指定的卡牌"""
+        self.discard_sound.play()
         # 将此牌从手中移动到弃牌堆
         self.trashed_cards[self.current_player].add(card)
         self.hand[self.current_player].remove(card)

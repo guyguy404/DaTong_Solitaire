@@ -17,11 +17,12 @@ class RuleWindow(Window):
         )
         self.text = self.settings.rule_window.text
         self.exit_button = Button(
-            msg="返回",
-            width=100,
-            height=60,
-            x=self.screen_rect.centerx,
-            y=self.screen_rect.centery + 300
+            msg=self.settings.rule_window.exit_button.msg,
+            width=self.settings.rule_window.exit_button.width,
+            height=self.settings.rule_window.exit_button.height,
+            x=self.settings.rule_window.exit_button.centerx,
+            y=self.settings.rule_window.exit_button.centery,
+            parent_obj=self
         )
     
     def blitme(self, surface: Optional[Surface] = None) -> None:
@@ -34,5 +35,5 @@ class RuleWindow(Window):
             fontsize=self.settings.rule_window.font_size,
             color=self.settings.rule_window.text_color
         )
-        self.exit_button.blitme()
+        self.exit_button.blitme(self.image)
         

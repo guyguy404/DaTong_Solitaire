@@ -31,6 +31,7 @@ class Settings(Singleton):
         else:
             raise Exception("No game provided when initializing Settings class!")
         
+        self.start_menu_music = ['music/开场音乐/Sneaky-Snitch.mp3', 'music/开场音乐/Monkeys-Spinning-Monkeys.mp3', 'music/开场音乐/Fluffing-a-Duck.mp3', 'music/开场音乐/Cipher2.mp3']
         self.ai_act_interval = 1000
         # default_screen_width, default_screen_height
         self.dft_scr_w = 1707
@@ -94,6 +95,20 @@ class Settings(Singleton):
             """
             self.top_margin = 50 * self.settings.scale_ratio
             self.left_margin = 50 * self.settings.scale_ratio
+            self.exit_button = Settings.RuleWindow.ExitButton(self.width, self.height)
+            
+        class ExitButton:
+            """规则窗口中的“返回”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                self.settings = Settings()
+                self.width = 100 * self.settings.scale_ratio
+                self.height = 60 * self.settings.scale_ratio
+                self.color = Settings.Color.white
+                self.text_color = Settings.Color.black
+                self.font_size = int(20 * self.settings.scale_ratio)
+                self.msg = '返回'
+                self.centerx = surf_width // 2
+                self.centery = int(surf_height * 0.9)
     
     class ExitWindow:
         """确认退出窗口的设置类"""
