@@ -4,7 +4,7 @@ import numpy
 from pygame.sprite import Sprite, Group
 from pygame.event import Event
 from pygame.mixer import Sound
-from random import shuffle, choice
+from random import shuffle, choice, random
 from functools import cmp_to_key
 
 from singleton import Singleton
@@ -41,6 +41,7 @@ class DaTongSolitaire(Singleton):
         self.start_menu_music = Sound(choice(self.settings.start_menu_music))
         self.start_menu_music.play()
         self.discard_sound = Sound('music/音效/要不起.mp3')
+        self.discovered = False
     
     def new_game(self):
         """重置游戏的所有状态，以开始一场新的游戏"""
@@ -212,9 +213,7 @@ class DaTongSolitaire(Singleton):
                 sys.exit()
             elif window.cancel_button.abs_rect.collidepoint(mouse_pos):
                 self.windows.pop()
-                if self.game_stage == GameStage.playing:
-                    if self.current_player != 0:
-                        pygame.time.set_timer(self.ai_act_event, self.settings.ai_act_interval, loops=4 - self.current_player)
+                self._continue_game()
     
     
     def _check_events_without_window(self, event: Event):
@@ -333,12 +332,20 @@ class DaTongSolitaire(Singleton):
         self.game_stage = GameStage.rule
         rule_window = RuleWindow()
         self.windows.append(rule_window)
-        
+    
+    def _stop_game(self):
+        if self.game_stage == GameStage.playing:
+            pygame.time.set_timer(self.ai_act_event, 0, loops=3)
+    
+    def _continue_game(self):
+        if self.game_stage == GameStage.playing:
+            if self.current_player != 0:
+                pygame.time.set_timer(self.ai_act_event, self.settings.ai_act_interval, loops=4 - self.current_player)
+    
     def exit_confirm(self):
         """确认退出"""
         self.windows.append(ExitWindow())
-        if self.game_stage == GameStage.playing:
-            pygame.time.set_timer(self.ai_act_event, 0, loops=3)
+        self._stop_game()
     
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
@@ -409,7 +416,6 @@ class DaTongSolitaire(Singleton):
     
     def _play_card(self, card: Card):
         """当前玩家打出指定的卡牌"""
-        card.sound.play()
         card.to_visible()
         # 将此牌从手中移动到场上
         if card.rank < 7:
@@ -441,11 +447,31 @@ class DaTongSolitaire(Singleton):
             raise Exception("We met a mistake in updating playable_cards!")
 
         for hand in self.hand:
-            for card in hand:
-                if card.info in self.playable_cards:
-                    card.playable = True
+            for hand_card in hand:
+                if hand_card.info in self.playable_cards:
+                    hand_card.playable = True
         
         self.end_turn = True
+        
+        # 埋个彩蛋
+        if card.info == (1, 13) and self.current_player == 0 and random() < 0.2 and not self.discovered:
+            self._stop_game()
+            extra_sound1 = Sound('music/cards/梅花13.mp3')
+            extra_sound1.play()
+            pygame.time.wait(3000)
+            extra_sound2 = Sound('music/cards/梅花567.mp3')
+            extra_sound2.play(fade_ms=2000)
+            pygame.time.wait(10000)
+            extra_sound2.fadeout(2000)
+            pygame.time.wait(2000)
+            extra_sound3 = Sound('music/彩蛋.mp3')
+            extra_sound3.play()
+            pygame.time.wait(1000)
+            self._continue_game()
+            self.discovered = True
+            return
+        
+        card.sound.play()
     
     def _discard_card(self, card: Card):
         """当前玩家弃置指定的卡牌"""
