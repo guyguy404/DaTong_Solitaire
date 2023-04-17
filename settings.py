@@ -51,6 +51,7 @@ class Settings(Singleton):
         self.game_over_menu = Settings.GameOverMenu()
         self.window = Settings.Window()
         self.rule_window = Settings.RuleWindow()
+        self.exit_window = Settings.ExitWindow()
     
     class Color:
         black = (0, 0, 0)
@@ -94,6 +95,52 @@ class Settings(Singleton):
             self.top_margin = 50 * self.settings.scale_ratio
             self.left_margin = 50 * self.settings.scale_ratio
     
+    class ExitWindow:
+        """确认退出窗口的设置类"""
+        def __init__(self):
+            self.settings = Settings()
+            self.width = 600 * self.settings.scale_ratio
+            self.height = 300 * self.settings.scale_ratio
+            self.text = Settings.ExitWindow.Text(self.width, self.height)
+            self.confirm_button = Settings.ExitWindow.ConfirmButton(self.width, self.height)
+            self.cancel_button = Settings.ExitWindow.CancelButton(self.width, self.height)
+        
+        class Text:
+            """退出确认窗口中文字的设置类"""
+            def __init__(self, surf_width, surf_height):
+                self.settings = Settings()
+                self.font_size = int(32 * self.settings.scale_ratio)
+                self.color = Settings.Color.black
+                self.text = "你确定要退出游戏吗？"
+                self.centerx = surf_width // 2
+                self.centery = int(surf_height * 0.25)
+        
+        class Button:
+            """退出确认窗口中所有按钮设置信息的基类"""
+            def __init__(self):
+                self.settings = Settings()
+                self.width = 150 * self.settings.scale_ratio
+                self.height = 80 * self.settings.scale_ratio
+                self.color = Settings.Color.white
+                self.text_color = Settings.Color.black
+                self.font_size = int(36 * self.settings.scale_ratio)
+        
+        class ConfirmButton(Button):
+            """退出确认窗口中的“确定”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "确定"
+                self.centerx = int(surf_width * 0.3)
+                self.centery = int(surf_height * 0.7)
+        
+        class CancelButton(Button):
+            """退出确认窗口中的“取消”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "取消"
+                self.centerx = int(surf_width * 0.7)
+                self.centery = int(surf_height * 0.7)
+    
     class StartMenu:
         """开始界面的设置类"""
         button_yspacing = 150
@@ -117,7 +164,7 @@ class Settings(Singleton):
                 self.height = 100 * self.settings.scale_ratio
                 self.color = Settings.Color.white
                 self.text_color = Settings.Color.black
-                self.font_size = int(32 * self.settings.scale_ratio)
+                self.font_size = int(28 * self.settings.scale_ratio)
             
         class PlayButton(Button):
             """开始界面中的“开始游戏”按钮设置类"""

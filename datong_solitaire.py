@@ -2,6 +2,7 @@ import sys
 import pygame
 import numpy
 from pygame.sprite import Sprite, Group
+from pygame.event import Event
 from random import shuffle
 from functools import cmp_to_key
 
@@ -15,6 +16,7 @@ from game_over_menu import GameOverMenu
 from ai_agent import AiAgent, AiAgentRandom, AiAgentNormal
 from window import Window
 from rule_window import RuleWindow
+from exit_window import ExitWindow
 from utils import darken
 
 class DaTongSolitaire(Singleton):
@@ -169,52 +171,152 @@ class DaTongSolitaire(Singleton):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            # 对不同场景进行分类处理
+            if self.windows:
+                self._check_events_with_window(event, self.windows[-1])
+            else:
+                self._check_events_without_window(event)
+            
+            
+
+    def _check_events_with_window(self, event: Event, window: Window):
+        """有弹出窗口时的事件检查"""
+        if isinstance(window, RuleWindow):
+            self._check_events_with_rule_window(event, window)
+        elif isinstance(window, ExitWindow):
+            self._check_events_with_exit_window(event, window)
+        else:
+            raise Exception("Unknown window!")
+            
+    def _check_events_with_rule_window(self, event: Event, window: RuleWindow):
+        """在规则窗口的事件检查"""
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if window.exit_button.rect.collidepoint(mouse_pos):
+                self.game_stage = GameStage.start_menu
+                self.windows.pop()
+    
+    def _check_events_with_exit_window(self, event: Event, window: ExitWindow):
+        """在退出确认窗口的事件检查"""
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if window.confirm_button.abs_rect.collidepoint(mouse_pos):
+                sys.exit()
+            elif window.cancel_button.abs_rect.collidepoint(mouse_pos):
+                self.windows.pop()
+    
+    
+    def _check_events_without_window(self, event: Event):
+        """无弹出窗口时的事件检查"""
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                # TODO
+                self.exit_confirm()
+                return
+        if self.game_stage == GameStage.start_menu:
+            self._check_events_in_start_menu(event)
+        elif self.game_stage == GameStage.playing:
+            self._check_events_in_game(event)
+        elif self.game_stage == GameStage.testing:
+            self._check_events_in_testing_game(event)
+        else:
+            # TODO
+            pass
+        
+        # elif event.type == pygame.MOUSEBUTTONDOWN:
+        #     if event.button == pygame.BUTTON_LEFT:
+        #         if self.game_stage == GameStage.start_menu:
+        #             # 检测是否点击了按钮
+        #             mouse_pos = pygame.mouse.get_pos()
+        #             if self.start_menu.play_button.rect.collidepoint(mouse_pos):
+        #                 self.new_game()
+        #             elif self.start_menu.rule_button.rect.collidepoint(mouse_pos):
+        #                 self.open_rule()
+        #             elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
+        #                 sys.exit()
+        #         elif self.game_stage == GameStage.rule:
+        #             # TODO
+        #             mouse_pos = pygame.mouse.get_pos()
+        #             if self.windows[-1].exit_button.rect.collidepoint(mouse_pos):
+        #                 self.game_stage = GameStage.start_menu
+        #                 self.windows.pop()
+        #         elif self.game_stage == GameStage.playing:
+        #             if self.current_player == 0:
+        #                 if self.focused_card:
+        #                     self._on_focused_card_clicked()
+        #         elif self.game_stage == GameStage.testing:
+        #             if self.focused_card:
+        #                 self._on_focused_card_clicked()
+        #         elif self.game_stage == GameStage.game_over_menu:
+        #             # TODO
+        #             mouse_pos = pygame.mouse.get_pos()
+        #             if self.game_over_menu.rect.collidepoint(mouse_pos):
+        #                 mouse_pos = (
+        #                         mouse_pos[0] - self.game_over_menu.rect.left,
+        #                         mouse_pos[1] - self.game_over_menu.rect.top
+        #                     )
+        #                 if self.game_over_menu.replay_button.rect.collidepoint(mouse_pos):
+        #                     self.new_game()
+        #                 elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
+        #                     sys.exit()
+        # elif event.type == self.ai_act_event:
+        #     if self.can_play_card:
+        #         card = self.ai_player[self.current_player].get_card_to_play()
+        #         self._play_card(card)
+        #     else:
+        #         card = self.ai_player[self.current_player].get_card_to_discard()
+        #         self._discard_card(card)
+    
+    def _check_events_in_start_menu(self, event: Event):
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.start_menu.play_button.rect.collidepoint(mouse_pos):
+                self.new_game()
+            elif self.start_menu.rule_button.rect.collidepoint(mouse_pos):
+                self.open_rule()
+            elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
+                self.exit_confirm()
+    
+    def _check_events_in_game(self, event: Event):
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.current_player == 0:
+                if self.focused_card:
+                    self._on_focused_card_clicked()
+        
+        # 如果是电脑出牌事件
+        elif event.type == self.ai_act_event:
+            if self.can_play_card:
+                card = self.ai_player[self.current_player].get_card_to_play()
+                self._play_card(card)
+            else:
+                card = self.ai_player[self.current_player].get_card_to_discard()
+                self._discard_card(card)
+    
+    def _check_events_in_testing_game(self, event: Event):
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.focused_card:
+                self._on_focused_card_clicked()
+    
+    def _check_events_in_game_over_menu(self, event: Event):
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.game_over_menu.rect.collidepoint(mouse_pos):
+                mouse_pos = (
+                        mouse_pos[0] - self.game_over_menu.rect.left,
+                        mouse_pos[1] - self.game_over_menu.rect.top
+                    )
+                if self.game_over_menu.replay_button.rect.collidepoint(mouse_pos):
+                    self.new_game()
+                elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
                     sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == pygame.BUTTON_LEFT:
-                    if self.game_stage == GameStage.start_menu:
-                        # 检测是否点击了按钮
-                        mouse_pos = pygame.mouse.get_pos()
-                        if self.start_menu.play_button.rect.collidepoint(mouse_pos):
-                            self.new_game()
-                        elif self.start_menu.rule_button.rect.collidepoint(mouse_pos):
-                            self.open_rule()
-                        elif self.start_menu.exit_button.rect.collidepoint(mouse_pos):
-                            sys.exit()
-                    elif self.game_stage == GameStage.rule:
-                        # TODO
-                        mouse_pos = pygame.mouse.get_pos()
-                        if self.windows[-1].exit_button.rect.collidepoint(mouse_pos):
-                            self.game_stage = GameStage.start_menu
-                            self.windows.pop()
-                    elif self.game_stage == GameStage.playing:
-                        if self.current_player == 0:
-                            if self.focused_card:
-                                self._on_focused_card_clicked()
-                    elif self.game_stage == GameStage.testing:
-                        if self.focused_card:
-                            self._on_focused_card_clicked()
-                    elif self.game_stage == GameStage.game_over_menu:
-                        # TODO
-                        mouse_pos = pygame.mouse.get_pos()
-                        if self.game_over_menu.rect.collidepoint(mouse_pos):
-                            mouse_pos = (
-                                    mouse_pos[0] - self.game_over_menu.rect.left,
-                                    mouse_pos[1] - self.game_over_menu.rect.top
-                                )
-                            if self.game_over_menu.replay_button.rect.collidepoint(mouse_pos):
-                                self.new_game()
-                            elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
-                                sys.exit()
-            elif event.type == self.ai_act_event:
-                if self.can_play_card:
-                    card = self.ai_player[self.current_player].get_card_to_play()
-                    self._play_card(card)
-                else:
-                    card = self.ai_player[self.current_player].get_card_to_discard()
-                    self._discard_card(card)
 
     def open_rule(self):
         """打开游戏规则界面"""
@@ -222,6 +324,9 @@ class DaTongSolitaire(Singleton):
         rule_window = RuleWindow()
         self.windows.append(rule_window)
         
+    def exit_confirm(self):
+        """确认退出"""
+        self.windows.append(ExitWindow())
     
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
