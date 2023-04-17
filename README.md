@@ -26,6 +26,12 @@
 
 ### 下载方式2：
 
+#### v1.2.1
+
+https://pan.baidu.com/s/1HdmsM84_4x_VFzkNoK-nWA?pwd=i0zp
+
+#### v1.1.3（旧版）
+
 https://pan.baidu.com/s/1U8sVzz95v1DsK0woQ5WG2A?pwd=7lg6
 
 
