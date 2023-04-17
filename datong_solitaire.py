@@ -11,6 +11,7 @@ from singleton import Singleton
 from settings import Settings
 from card import Card
 from board import Board
+from button import Button
 from game_stage import GameStage
 from start_menu import StartMenu
 from game_over_menu import GameOverMenu
@@ -18,6 +19,7 @@ from ai_agent import AiAgent, AiAgentRandom, AiAgentNormal
 from window import Window
 from rule_window import RuleWindow
 from exit_window import ExitWindow
+from stop_game_window import StopGameWindow
 from utils import darken
 
 class DaTongSolitaire(Singleton):
@@ -48,6 +50,15 @@ class DaTongSolitaire(Singleton):
         pygame.mixer.fadeout(1000)
         self.game_stage = GameStage.playing
         self.board = Board()
+        self.stop_button = Button(
+            msg=self.settings.field.stop_button.msg,
+            width=self.settings.field.stop_button.width,
+            height=self.settings.field.stop_button.height,
+            x=self.settings.field.stop_button.centerx,
+            y=self.settings.field.stop_button.centery,
+            button_color=self.settings.field.stop_button.color,
+            font_size=self.settings.field.stop_button.font_size
+        )
         self.hand: list[Group] = [Group(), Group(), Group(), Group()]
         self.trashed_cards: list[Group] = [Group(), Group(), Group(), Group()]
         self.played_cards_less_7: list[list[Card]] = [[], [], [], []]
@@ -192,6 +203,8 @@ class DaTongSolitaire(Singleton):
             self._check_events_with_rule_window(event, window)
         elif isinstance(window, ExitWindow):
             self._check_events_with_exit_window(event, window)
+        elif isinstance(window, StopGameWindow):
+            self._check_events_with_stop_game_window(event, window)
         else:
             raise Exception("Unknown window!")
             
@@ -215,6 +228,19 @@ class DaTongSolitaire(Singleton):
                 self.windows.pop()
                 self._continue_game()
     
+    def _check_events_with_stop_game_window(self, event: Event, window: StopGameWindow):
+        """在游戏暂停窗口的事件检查"""
+        # 如果左键点击
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == pygame.BUTTON_LEFT:
+            mouse_pos = pygame.mouse.get_pos()
+            if window.replay_button.abs_rect.collidepoint(mouse_pos):
+                self.windows.pop()
+                self.new_game()
+            elif window.continue_button.abs_rect.collidepoint(mouse_pos):
+                self.windows.pop()
+                self._continue_game()
+            elif window.exit_button.abs_rect.collidepoint(mouse_pos):
+                self.exit_confirm()
     
     def _check_events_without_window(self, event: Event):
         """无弹出窗口时的事件检查"""
@@ -296,6 +322,8 @@ class DaTongSolitaire(Singleton):
             if self.current_player == 0:
                 if self.focused_card:
                     self._on_focused_card_clicked()
+            if self.stop_button.abs_rect.collidepoint(mouse_pos):
+                self._open_stop_game_window()
         
         # 如果是电脑出牌事件
         elif event.type == self.ai_act_event:
@@ -326,6 +354,12 @@ class DaTongSolitaire(Singleton):
                     self.new_game()
                 elif self.game_over_menu.exit_button.rect.collidepoint(mouse_pos):
                     self.exit_confirm()
+    
+    def _open_stop_game_window(self):
+        """打开游戏暂停窗口"""
+        self._stop_game()
+        self.windows.append(StopGameWindow())
+        
 
     def open_rule(self):
         """打开游戏规则界面"""
@@ -495,6 +529,7 @@ class DaTongSolitaire(Singleton):
             pass
         elif self.game_stage == GameStage.playing:
             self.board.blitme()
+            self.stop_button.blitme()
             self._draw_cards()
         elif self.game_stage == GameStage.testing:
             self.board.blitme()

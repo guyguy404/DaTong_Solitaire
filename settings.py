@@ -53,6 +53,7 @@ class Settings(Singleton):
         self.window = Settings.Window()
         self.rule_window = Settings.RuleWindow()
         self.exit_window = Settings.ExitWindow()
+        self.stop_game_window = Settings.StopGameWindow()
     
     class Color:
         black = (0, 0, 0)
@@ -156,6 +157,61 @@ class Settings(Singleton):
                 self.centerx = int(surf_width * 0.7)
                 self.centery = int(surf_height * 0.7)
     
+    class StopGameWindow:
+        """暂停游戏窗口的设置类"""
+        def __init__(self):
+            self.settings = Settings()
+            self.width = 600 * self.settings.scale_ratio
+            self.height = 300 * self.settings.scale_ratio
+            self.text = Settings.StopGameWindow.Text(self.width, self.height)
+            self.replay_button = Settings.StopGameWindow.ReplayButton(self.width, self.height)
+            self.continue_button = Settings.StopGameWindow.ContinueButton(self.width, self.height)
+            self.exit_button = Settings.StopGameWindow.ExitButton(self.width, self.height)
+        
+        class Text:
+            """游戏暂停窗口中文字的设置类"""
+            def __init__(self, surf_width, surf_height):
+                self.settings = Settings()
+                self.font_size = int(32 * self.settings.scale_ratio)
+                self.color = Settings.Color.black
+                self.text = "游戏已经暂停"
+                self.centerx = surf_width // 2
+                self.centery = int(surf_height * 0.25)
+        
+        class Button:
+            """游戏暂停窗口中所有按钮设置信息的基类"""
+            def __init__(self):
+                self.settings = Settings()
+                self.width = 120 * self.settings.scale_ratio
+                self.height = 80 * self.settings.scale_ratio
+                self.color = Settings.Color.white
+                self.text_color = Settings.Color.black
+                self.font_size = int(36 * self.settings.scale_ratio)
+        
+        class ReplayButton(Button):
+            """游戏暂停窗口中的“重来”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "重来"
+                self.centerx = int(surf_width * 0.2)
+                self.centery = int(surf_height * 0.7)
+        
+        class ContinueButton(Button):
+            """游戏暂停窗口中的“继续”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "继续"
+                self.centerx = int(surf_width * 0.5)
+                self.centery = int(surf_height * 0.7)
+        
+        class ExitButton(Button):
+            """游戏暂停窗口中的“退出”按钮设置类"""
+            def __init__(self, surf_width, surf_height):
+                super().__init__()
+                self.msg = "退出"
+                self.centerx = int(surf_width * 0.8)
+                self.centery = int(surf_height * 0.7)
+    
     class StartMenu:
         """开始界面的设置类"""
         button_yspacing = 150
@@ -242,6 +298,20 @@ class Settings(Singleton):
             self.xspacing = screen_rect.width // 6
             self.left_margin = int(self.xspacing * 1.5)
             self.yspacing = self.card.hand_yspacing
+            self.stop_button = Settings.Field.StopButton()
+        
+        class StopButton:
+            """游戏时的暂停按钮"""
+            def __init__(self):
+                self.settings = Settings()
+                self.width = 200 * self.settings.scale_ratio
+                self.height = 100 * self.settings.scale_ratio
+                self.color = Settings.Color.burlywood
+                self.text_color = Settings.Color.black
+                self.font_size = int(32 * self.settings.scale_ratio)
+                self.msg = "暂停"
+                self.centerx = 1520 * self.settings.scale_ratio
+                self.centery = 100 * self.settings.scale_ratio
     
     class Board:
         """信息面板相关的设置类"""
