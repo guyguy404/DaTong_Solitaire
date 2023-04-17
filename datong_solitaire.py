@@ -206,6 +206,9 @@ class DaTongSolitaire(Singleton):
                 sys.exit()
             elif window.cancel_button.abs_rect.collidepoint(mouse_pos):
                 self.windows.pop()
+                if self.game_stage == GameStage.playing:
+                    if self.current_player != 0:
+                        pygame.time.set_timer(self.ai_act_event, self.settings.ai_act_interval, loops=4 - self.current_player)
     
     
     def _check_events_without_window(self, event: Event):
@@ -327,6 +330,8 @@ class DaTongSolitaire(Singleton):
     def exit_confirm(self):
         """确认退出"""
         self.windows.append(ExitWindow())
+        if self.game_stage == GameStage.playing:
+            pygame.time.set_timer(self.ai_act_event, 0, loops=3)
     
     def _next_turn(self):
         """即将进入下一个玩家的回合"""
