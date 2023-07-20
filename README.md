@@ -12,6 +12,18 @@
 
 
 
+## 游戏界面展示
+
+![开始界面](https://github.com/Nobody-Know/DaTong_Solitaire/blob/master/images/readme/%E5%BC%80%E5%A7%8B%E7%95%8C%E9%9D%A2.png)
+
+![规则](https://github.com/Nobody-Know/DaTong_Solitaire/blob/master/images/readme/%E8%A7%84%E5%88%99.png)
+
+![游戏界面](https://github.com/Nobody-Know/DaTong_Solitaire/blob/master/images/readme/%E6%B8%B8%E6%88%8F%E7%95%8C%E9%9D%A2.png)
+
+![结算界面](https://github.com/Nobody-Know/DaTong_Solitaire/blob/master/images/readme/%E7%BB%93%E7%AE%97%E7%95%8C%E9%9D%A2.png)
+
+
+
 ## 游玩指南
 
 ### 下载方式1：
